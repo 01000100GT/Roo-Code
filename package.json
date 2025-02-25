@@ -1,7 +1,7 @@
 {
 	"name": "roo-cline",
-	"displayName": "Roo Code (prev. Roo Cline)",
-	"description": "An AI-powered autonomous coding agent that lives in your editor.",
+	"displayName": "Roo Code(汉化版)",
+	"description": "一个生活在编辑器中的AI驱动的自主编码代理。",
 	"publisher": "RooVeterinaryInc",
 	"version": "3.7.2",
 	"icon": "assets/icons/rocket.png",
@@ -54,7 +54,7 @@
 			"activitybar": [
 				{
 					"id": "roo-cline-ActivityBar",
-					"title": "Roo Code",
+					"title": "Roo Code(汉化版)",
 					"icon": "$(rocket)"
 				}
 			]
@@ -71,12 +71,12 @@
 		"commands": [
 			{
 				"command": "roo-cline.plusButtonClicked",
-				"title": "New Task",
+				"title": "新任务",
 				"icon": "$(add)"
 			},
 			{
 				"command": "roo-cline.mcpButtonClicked",
-				"title": "MCP Servers",
+				"title": "MCP服务",
 				"icon": "$(server)"
 			},
 			{
@@ -86,7 +86,7 @@
 			},
 			{
 				"command": "roo-cline.historyButtonClicked",
-				"title": "History",
+				"title": "历史",
 				"icon": "$(history)"
 			},
 			{
@@ -96,12 +96,12 @@
 			},
 			{
 				"command": "roo-cline.settingsButtonClicked",
-				"title": "Settings",
+				"title": "设置",
 				"icon": "$(settings-gear)"
 			},
 			{
 				"command": "roo-cline.helpButtonClicked",
-				"title": "Documentation",
+				"title": "文档",
 				"icon": "$(question)"
 			},
 			{

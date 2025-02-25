@@ -1000,13 +1000,9 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 					}}>
 					{showAnnouncement && <Announcement version={version} hideAnnouncement={hideAnnouncement} />}
 					<div style={{ padding: "0 20px", flexShrink: 0 }}>
-						<h2>What can Roo do for you?</h2>
+						<h2>Roo能为你做些什么？</h2>
 						<p>
-							Thanks to the latest breakthroughs in agentic coding capabilities, I can handle complex
-							software development tasks step-by-step. With tools that let me create & edit files, explore
-							complex projects, use the browser, and execute terminal commands (after you grant
-							permission), I can assist you in ways that go beyond code completion or tech support. I can
-							even use MCP to create new tools and extend my own capabilities.
+						多亏了在智能代理编码能力方面的最新突破，我能够一步步地处理复杂的软件开发任务。借助那些能让我创建和编辑文件、探索复杂项目、使用浏览器以及（在你授予权限后）执行终端命令的工具，我可以以超越代码补全或技术支持的方式为你提供帮助。我甚至可以使用MCP来创建新工具并扩展我自身的能力。
 						</p>
 					</div>
 					{taskHistory.length > 0 && <HistoryPreview showHistoryView={showHistoryView} />}

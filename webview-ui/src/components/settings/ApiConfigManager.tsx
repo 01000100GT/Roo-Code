@@ -150,7 +150,7 @@ const ApiConfigManager = ({
 					gap: "2px",
 				}}>
 				<label htmlFor="config-profile">
-					<span style={{ fontWeight: "500" }}>Configuration Profile</span>
+					<span style={{ fontWeight: "500" }}>配置文件</span>
 				</label>
 
 				{isRenaming ? (
