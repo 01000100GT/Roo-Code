@@ -9,4 +9,14 @@ nvm use v20.10.0
     npm run install:all
 ```
 3. **Debug**:
-    - 按F5
+    - 按F5调试
+    - 如果修改了webview-ui目录下的文件，需要再执行npm run build:webview才能生效
+
+4. **git首次提交到github**:
+```bash
+    git branch chinese
+    git checkout chinese
+    git add .
+    git commit -n -m '汉化' # -n参数 暂时忽略 Husky 的 pre - commit 钩子
+    git push --set-upstream origin chinese
+```
