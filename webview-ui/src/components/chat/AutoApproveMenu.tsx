@@ -42,14 +42,14 @@ const AutoApproveMenu = ({ style }: AutoApproveMenuProps) => {
 			label: "Read files and directories",
 			shortName: "Read",
 			enabled: alwaysAllowReadOnly ?? false,
-			description: "Allows access to read any file on your computer.",
+			description: "允许读取计算机上的任何文件。",
 		},
 		{
 			id: "editFiles",
 			label: "Edit files",
 			shortName: "Edit",
 			enabled: alwaysAllowWrite ?? false,
-			description: "Allows modification of any files on your computer.",
+			description: "允许修改计算机上的任何文件。",
 		},
 		{
 			id: "executeCommands",
@@ -57,21 +57,21 @@ const AutoApproveMenu = ({ style }: AutoApproveMenuProps) => {
 			shortName: "Commands",
 			enabled: alwaysAllowExecute ?? false,
 			description:
-				"Allows execution of approved terminal commands. You can configure this in the settings panel.",
+				"允许执行已授权的终端命令。您可以在设置面板中进行配置。",
 		},
 		{
 			id: "useBrowser",
 			label: "Use the browser",
 			shortName: "Browser",
 			enabled: alwaysAllowBrowser ?? false,
-			description: "Allows ability to launch and interact with any website in a headless browser.",
+			description: "允许在无头浏览器中启动任何网站并与之交互。",
 		},
 		{
 			id: "useMcp",
 			label: "Use MCP servers",
 			shortName: "MCP",
 			enabled: alwaysAllowMcp ?? false,
-			description: "Allows use of configured MCP servers which may modify filesystem or interact with APIs.",
+			description: "允许使用已配置的MCP服务器，这些服务器可以修改文件系统或与API交互。",
 		},
 		{
 			id: "switchModes",
@@ -79,14 +79,14 @@ const AutoApproveMenu = ({ style }: AutoApproveMenuProps) => {
 			shortName: "Modes",
 			enabled: alwaysAllowModeSwitch ?? false,
 			description:
-				"Allows automatic switching between different AI modes and creating new tasks without requiring approval.",
+				"允许在不同的AI模式之间自动切换，并在不需要授权的情况下创建新任务。",
 		},
 		{
 			id: "retryRequests",
 			label: "Retry failed requests",
 			shortName: "Retries",
 			enabled: alwaysApproveResubmit ?? false,
-			description: "Automatically retry failed API requests when the provider returns an error response.",
+			description: "当提供程序返回错误响应时，自动重试失败的API请求。",
 		},
 	]
 
@@ -226,8 +226,7 @@ const AutoApproveMenu = ({ style }: AutoApproveMenuProps) => {
 							color: "var(--vscode-descriptionForeground)",
 							fontSize: "12px",
 						}}>
-						Auto-approve allows Roo Code to perform actions without asking for permission. Only enable for
-						actions you fully trust.
+						Auto-approve(自动授权)允许Roo Code在不请求许可的情况下执行操作。仅执行你完全信任的操作。
 					</div>
 					{actions.map((action) => (
 						<div key={action.id} style={{ margin: "6px 0" }}>

@@ -32,17 +32,17 @@ interface SupportPromptConfig {
 
 const supportPromptConfigs: Record<string, SupportPromptConfig> = {
 	ENHANCE: {
-		label: "Enhance Prompt",
+		label: "增强 Prompt",
 		description:
-			"Use prompt enhancement to get tailored suggestions or improvements for your inputs. This ensures Roo understands your intent and provides the best possible responses. Available via the ✨ icon in chat.",
+			"使用即时增强功能为您的输入提供量身定制的建议或改进。这可以确保Roo理解您的意图，并提供最佳的响应。可通过 ✨ 图标在聊天中使用。",
 		template: `Generate an enhanced version of this prompt (reply with only the enhanced prompt - no conversation, explanations, lead-in, bullet points, placeholders, or surrounding quotes):
 
 \${userInput}`,
 	},
 	EXPLAIN: {
-		label: "Explain Code",
+		label: "解释代码",
 		description:
-			"Get detailed explanations of code snippets, functions, or entire files. Useful for understanding complex code or learning new patterns. Available in code actions (lightbulb icon in the editor) and the editor context menu (right-click on selected code).",
+			"获取代码片段、函数或整个文件的详细解释。有助于理解复杂代码或学习新模式。在代码操作（编辑器中的灯泡图标）和编辑器上下文菜单（右键单击所选代码）中可用。",
 		template: `Explain the following code from file path @/\${filePath}:
 \${userInput}
 
@@ -56,9 +56,9 @@ Please provide a clear and concise explanation of what this code does, including
 3. Important patterns or techniques used`,
 	},
 	FIX: {
-		label: "Fix Issues",
+		label: "Fix Issues(解决问题)",
 		description:
-			"Get help identifying and resolving bugs, errors, or code quality issues. Provides step-by-step guidance for fixing problems. Available in code actions (lightbulb icon in the editor) and the editor context menu (right-click on selected code).",
+			"获取识别和解决bug、错误或代码质量问题的帮助。提供解决问题的分步指导。在代码操作（编辑器中的灯泡图标）和编辑器上下文菜单（右键单击所选代码）中可用。",
 		template: `Fix any issues in the following code from file path @/\${filePath}
 \${diagnosticText}
 \${userInput}
@@ -74,9 +74,9 @@ Please:
 4. Explain what was fixed and why`,
 	},
 	IMPROVE: {
-		label: "Improve Code",
+		label: "Improve Code(改进代码)",
 		description:
-			"Receive suggestions for code optimization, better practices, and architectural improvements while maintaining functionality. Available in code actions (lightbulb icon in the editor) and the editor context menu (right-click on selected code).",
+			"在维护功能的同时，接收代码优化、更好实践和架构改进的建议。在代码操作（编辑器中的灯泡图标）和编辑器上下文菜单（右键单击所选代码）中可用。",
 		template: `Improve the following code from file path @/\${filePath}:
 \${userInput}
 
@@ -95,7 +95,7 @@ Provide the improved code along with explanations for each enhancement.`,
 	ADD_TO_CONTEXT: {
 		label: "Add to Context",
 		description:
-			"Add context to your current task or conversation. Useful for providing additional information or clarifications. Available in code actions (lightbulb icon in the editor). and the editor context menu (right-click on selected code).",
+			"为当前任务或对话添加上下文。有助于提供额外信息或澄清。在代码操作中可用（编辑器中的灯泡图标）。以及编辑器上下文菜单（右键单击所选代码）。",
 		template: `@/\${filePath}:
 \`\`\`
 \${selectedText}
@@ -104,7 +104,7 @@ Provide the improved code along with explanations for each enhancement.`,
 	TERMINAL_ADD_TO_CONTEXT: {
 		label: "Add Terminal Content to Context",
 		description:
-			"Add terminal output to your current task or conversation. Useful for providing command outputs or logs. Available in the terminal context menu (right-click on selected terminal content).",
+			"将终端输出添加到当前任务或对话中。可用于提供命令输出或日志。在终端上下文菜单中可用（右键单击选定的终端内容）。",
 		template: `\${userInput}
 Terminal output:
 \`\`\`
@@ -114,7 +114,7 @@ Terminal output:
 	TERMINAL_FIX: {
 		label: "Fix Terminal Command",
 		description:
-			"Get help fixing terminal commands that failed or need improvement. Available in the terminal context menu (right-click on selected terminal content).",
+			"获取帮助，修复失败或需要改进的终端命令。在终端上下文菜单中可用（右键单击选定的终端内容）。",
 		template: `\${userInput}
 Fix this terminal command:
 \`\`\`
@@ -129,7 +129,7 @@ Please:
 	TERMINAL_EXPLAIN: {
 		label: "Explain Terminal Command",
 		description:
-			"Get detailed explanations of terminal commands and their outputs. Available in the terminal context menu (right-click on selected terminal content).",
+			"获取终端命令及其输出的详细说明。在终端上下文菜单中可用（右键单击选定的终端内容）。",
 		template: `\${userInput}
 Explain this terminal command:
 \`\`\`

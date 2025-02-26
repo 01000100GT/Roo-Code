@@ -8,11 +8,15 @@ nvm use v20.10.0
 ```bash
     npm run install:all
 ```
-3. **Debug**:
+3. **启动webview的HMR热更服务**:
+    ```bash
+    npm run dev
+    ```
+4. **Debug**:
     - 按F5调试
     - 如果修改了webview-ui目录下的文件，需要再执行npm run build:webview才能生效
 
-4. **git首次提交到github**:
+5. **git首次提交到github**:
 ```bash
     git branch chinese
     git checkout chinese

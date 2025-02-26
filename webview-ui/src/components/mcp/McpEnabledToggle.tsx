@@ -16,7 +16,7 @@ const McpEnabledToggle = () => {
 	return (
 		<div style={{ marginBottom: "20px" }}>
 			<VSCodeCheckbox checked={mcpEnabled} onChange={handleChange}>
-				<span style={{ fontWeight: "500" }}>Enable MCP Servers</span>
+				<span style={{ fontWeight: "500" }}>启动 MCP 服务</span>
 			</VSCodeCheckbox>
 			<p
 				style={{
@@ -24,8 +24,7 @@ const McpEnabledToggle = () => {
 					marginTop: "5px",
 					color: "var(--vscode-descriptionForeground)",
 				}}>
-				When enabled, Roo will be able to interact with MCP servers for advanced functionality. If you're not
-				using MCP, you can disable this to reduce Roo's token usage.
+				启用后，Roo将能够与MCP服务器交互以实现高级功能。如果你不使用MCP，您可以禁用此功能以减少Roo的令牌使用。
 			</p>
 		</div>
 	)
