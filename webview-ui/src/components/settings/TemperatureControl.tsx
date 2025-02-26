@@ -36,7 +36,7 @@ export const TemperatureControl = ({ value, onChange, maxValue = 1 }: Temperatur
 			</VSCodeCheckbox>
 
 			<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-				Controls randomness in the model's responses.
+				控制模型响应中的随机性。
 			</p>
 
 			{isCustomTemperature && (
@@ -60,7 +60,7 @@ export const TemperatureControl = ({ value, onChange, maxValue = 1 }: Temperatur
 						<span>{inputValue}</span>
 					</div>
 					<p style={{ fontSize: "12px", marginTop: "8px", color: "var(--vscode-descriptionForeground)" }}>
-						Higher values make output more random, lower values make it more deterministic.
+						较高的值使输出更随机，较低的值使其更具确定性。
 					</p>
 				</div>
 			)}

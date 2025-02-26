@@ -16,7 +16,7 @@ const McpEnabledToggle = () => {
 	return (
 		<div style={{ marginBottom: "20px" }}>
 			<VSCodeCheckbox checked={mcpEnabled} onChange={handleChange}>
-				<span style={{ fontWeight: "500" }}>启动 MCP 服务</span>
+				<span style={{ fontWeight: "500" }}>启动 MCP Servers</span>
 			</VSCodeCheckbox>
 			<p
 				style={{

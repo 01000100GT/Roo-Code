@@ -680,7 +680,7 @@ export const deepSeekModels = {
 		supportsPromptCache: false,
 		inputPrice: 0.014, // $0.014 per million tokens
 		outputPrice: 0.28, // $0.28 per million tokens
-		description: `DeepSeek-V3 achieves a significant breakthrough in inference speed over previous models. It tops the leaderboard among open-source models and rivals the most advanced closed-source models globally.`,
+		description: `DeepSeek-V3在推理速度方面比以前的模型取得了重大突破。它在开源模型中排名第一，并与全球最先进的闭源模型竞争。`,
 	},
 	"deepseek-reasoner": {
 		maxTokens: 8192,
@@ -689,7 +689,7 @@ export const deepSeekModels = {
 		supportsPromptCache: false,
 		inputPrice: 0.55, // $0.55 per million tokens
 		outputPrice: 2.19, // $2.19 per million tokens
-		description: `DeepSeek-R1 achieves performance comparable to OpenAI-o1 across math, code, and reasoning tasks.`,
+		description: `DeepSeek-R1在数学、代码和推理任务上实现了与OpenAI-o1相当的性能。`,
 	},
 } as const satisfies Record<string, ModelInfo>
 

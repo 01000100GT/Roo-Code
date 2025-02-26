@@ -14,7 +14,7 @@ nvm use v20.10.0
     ```
 4. **Debug**:
     - 按F5调试
-    - 如果修改了webview-ui目录下的文件，需要再执行npm run build:webview才能生效
+    - 如果修改了webview-ui目录下的文件，并且未执行第3步开启热更服务，需要手动执行npm run build:webview后才能生效
 
 5. **git首次提交到github**:
 ```bash

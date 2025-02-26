@@ -352,11 +352,9 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 				</div>
 
 				<div style={{ marginBottom: 40 }}>
-					<h3 style={{ color: "var(--vscode-foreground)", margin: "0 0 15px 0" }}>Auto-Approve Settings</h3>
+					<h3 style={{ color: "var(--vscode-foreground)", margin: "0 0 15px 0" }}>Auto-Approve(自动授权) Settings</h3>
 					<p style={{ fontSize: "12px", marginBottom: 15, color: "var(--vscode-descriptionForeground)" }}>
-						The following settings allow Roo to automatically perform operations without requiring approval.
-						Enable these settings only if you fully trust the AI and understand the associated security
-						risks.
+						以下设置允许Roo自动执行操作，无需授权。仅当您完全信任AI并了解相关安全性时，才启用这些设置风险。
 					</p>
 
 					<div style={{ marginBottom: 15 }}>
@@ -371,8 +369,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 								marginTop: "5px",
 								color: "var(--vscode-descriptionForeground)",
 							}}>
-							When enabled, Roo will automatically view directory contents and read files without
-							requiring you to click the Approve button.
+							启用后，Roo将自动查看目录内容和读取文件，而无需您单击“批准”按钮。
 						</p>
 					</div>
 
@@ -383,7 +380,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							<span style={{ fontWeight: "500" }}>Always approve write operations</span>
 						</VSCodeCheckbox>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-							Automatically create and edit files without requiring approval
+						自动创建和编辑文件，无需授权
 						</p>
 						{alwaysAllowWrite && (
 							<div
@@ -410,7 +407,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 										marginTop: "5px",
 										color: "var(--vscode-descriptionForeground)",
 									}}>
-									Delay after writes to allow diagnostics to detect potential problems
+									写入后延迟，以允许诊断检测潜在问题
 								</p>
 							</div>
 						)}
@@ -423,9 +420,9 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							<span style={{ fontWeight: "500" }}>Always approve browser actions</span>
 						</VSCodeCheckbox>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-							Automatically perform browser actions without requiring approval
+							无需批准即可自动执行浏览器操作
 							<br />
-							Note: Only applies when the model supports computer use
+							Note: 仅适用于型号支持的计算机的情况使用
 						</p>
 					</div>
 
@@ -436,7 +433,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							<span style={{ fontWeight: "500" }}>Always retry failed API requests</span>
 						</VSCodeCheckbox>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-							Automatically retry failed API requests when server returns an error response
+							当服务器返回错误响应时，自动重试失败的API请求
 						</p>
 						{alwaysApproveResubmit && (
 							<div
@@ -465,7 +462,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 										marginTop: "5px",
 										color: "var(--vscode-descriptionForeground)",
 									}}>
-									Delay before retrying the request
+									重试请求前的延迟
 								</p>
 							</div>
 						)}
@@ -478,8 +475,8 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							<span style={{ fontWeight: "500" }}>Always approve MCP tools</span>
 						</VSCodeCheckbox>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-							Enable auto-approval of individual MCP tools in the MCP Servers view (requires both this
-							setting and the tool's individual "Always allow" checkbox)
+						自动授权在MCP服务器视图中启用的MCP工具（需要这个
+						设置和MCP工具那里都勾选上“始终允许”复选框）
 						</p>
 					</div>
 
@@ -490,8 +487,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							<span style={{ fontWeight: "500" }}>Always approve mode switching & task creation</span>
 						</VSCodeCheckbox>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-							Automatically switch between different AI modes and create new tasks without requiring
-							approval
+							在不同的AI模式之间自动切换并创建新任务，而无需批准
 						</p>
 					</div>
 
@@ -502,7 +498,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							<span style={{ fontWeight: "500" }}>Always approve allowed execute operations</span>
 						</VSCodeCheckbox>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-							Automatically execute allowed terminal commands without requiring approval
+							自动执行允许的终端命令，无需批准
 						</p>
 
 						{alwaysAllowExecute && (
@@ -519,8 +515,8 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 										marginTop: "5px",
 										color: "var(--vscode-descriptionForeground)",
 									}}>
-									Command prefixes that can be auto-executed when "Always approve execute operations"
-									is enabled. Add * to allow all commands (use with caution).
+									当"Always approve execute operations"被勾选时可执行的命令前缀。
+									填加 * 以允许所有命令（谨慎使用）。
 								</p>
 
 								<div style={{ display: "flex", gap: "5px", marginTop: "10px" }}>
@@ -599,8 +595,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 								marginTop: "5px",
 								color: "var(--vscode-descriptionForeground)",
 							}}>
-							Select the viewport size for browser interactions. This affects how websites are displayed
-							and interacted with.
+							选择浏览器交互的视窗大小。这会影响网站的显示和互动。
 						</p>
 					</div>
 
@@ -626,8 +621,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 								marginTop: "5px",
 								color: "var(--vscode-descriptionForeground)",
 							}}>
-							Adjust the WebP quality of browser screenshots. Higher values provide clearer screenshots
-							but increase token usage.
+							调整浏览器截图的WebP质量。值越高，屏幕截图越清晰，但增加令牌使用。
 						</p>
 					</div>
 				</div>
@@ -646,7 +640,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 								marginTop: "5px",
 								color: "var(--vscode-descriptionForeground)",
 							}}>
-							When enabled, Roo will play sound effects for notifications and events.
+							启用后，Roo将为通知和事件播放音效。
 						</p>
 					</div>
 					{soundEnabled && (
@@ -717,8 +711,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							</div>
 						</div>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-							Maximum number of lines to include in terminal output when executing commands. When exceeded
-							lines will be removed from the middle, saving tokens.
+							执行命令时终端输出中包含的最大行数。超过时将从中间删除行，以节省令牌。
 						</p>
 					</div>
 
@@ -741,8 +734,8 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							</div>
 						</div>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-							Maximum number of VSCode open tabs to include in context. Higher values provide more context
-							but increase token usage.
+							包含在上下文中的VSCode打开选项卡的最大数量。更高的值提供更多的上下文
+							但增加令牌使用。
 						</p>
 					</div>
 
@@ -764,8 +757,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 								marginTop: "5px",
 								color: "var(--vscode-descriptionForeground)",
 							}}>
-							When enabled, Roo will be able to edit files more quickly and will automatically reject
-							truncated full-file writes. Works best with the latest Claude 3.7 Sonnet model.
+							启用后，Roo将能够更快地编辑文件，并自动拒绝截断的完整文件写入。与最新的Claude 3.7 Sonnet型号配合使用效果最佳。
 						</p>
 
 						{diffEnabled && (
@@ -803,9 +795,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 											marginTop: "5px",
 											color: "var(--vscode-descriptionForeground)",
 										}}>
-										This slider controls how precisely code sections must match when applying diffs.
-										Lower values allow more flexible matching but increase the risk of incorrect
-										replacements. Use values below 100% with extreme caution.
+										此滑块控制应用差异时代码段必须匹配的精确程度。较低的值允许更灵活的匹配，但会增加不正确的风险。使用低于100%的值时要格外小心。
 									</p>
 									<ExperimentalFeature
 										key={EXPERIMENT_IDS.DIFF_STRATEGY}

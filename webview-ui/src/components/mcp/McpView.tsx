@@ -88,9 +88,7 @@ const McpView = ({ onDone }: McpViewProps) => {
 									marginTop: "5px",
 									color: "var(--vscode-descriptionForeground)",
 								}}>
-								When enabled, Roo can help you create new MCP servers via commands like "add a new tool
-								to...". If you don't need to create MCP servers you can disable this to reduce Roo's
-								token usage.
+								启用后，Roo可以通过“向…添加一个新工具”等命令帮助您创建新的MCP服务器。如果你不需要创建MCP服务器，你可以禁用它来减少Roo的令牌使用。
 							</p>
 						</div>
 

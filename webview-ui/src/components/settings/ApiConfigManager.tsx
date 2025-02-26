@@ -281,7 +281,7 @@ const ApiConfigManager = ({
 								margin: "5px 0 12px",
 								color: "var(--vscode-descriptionForeground)",
 							}}>
-							Save different API configurations to quickly switch between providers and settings
+							保存不同的API配置，以便在提供程序和设置之间快速切换
 						</p>
 					</>
 				)}

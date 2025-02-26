@@ -500,7 +500,7 @@ const PromptsView = ({ onDone }: PromptsViewProps) => {
 						</p>
 					</div>
 
-					<div className="font-bold mb-1">所有模式的自定义说明</div>
+					<div className="font-bold mb-1">所有AI模式的自定义说明</div>
 					<div className="text-sm text-vscode-descriptionForeground mb-2">
 						这些说明适用于所有模式。它们提供了一组可以增强的基本行为
 						根据以下特定模式的说明。
@@ -544,7 +544,7 @@ const PromptsView = ({ onDone }: PromptsViewProps) => {
 
 				<div className="mt-5">
 					<div onClick={(e) => e.stopPropagation()} className="flex justify-between items-center mb-3">
-						<h3 className="text-vscode-foreground m-0">模式</h3>
+						<h3 className="text-vscode-foreground m-0">AI模式</h3>
 						<div className="flex gap-2">
 							<VSCodeButton appearance="icon" onClick={openCreateModeDialog} title="Create new mode">
 								<span className="codicon codicon-add"></span>
@@ -906,8 +906,8 @@ const PromptsView = ({ onDone }: PromptsViewProps) => {
 								color: "var(--vscode-descriptionForeground)",
 								marginTop: "5px",
 							}}>
-							Custom instructions specific to {getCurrentMode()?.name || "Code"} mode can also be loaded
-							from{" "}
+							针对 {getCurrentMode()?.name || "Code"} 模式的自定义说明也可以加载于
+							{" "}
 							<span
 								style={{
 									color: "var(--vscode-textLink-foreground)",
@@ -930,7 +930,7 @@ const PromptsView = ({ onDone }: PromptsViewProps) => {
 								}}>
 								.clinerules-{getCurrentMode()?.slug || "code"}
 							</span>{" "}
-							in your workspace.
+							在您的工作空间中。
 						</div>
 					</div>
 				</div>
@@ -1075,8 +1075,8 @@ const PromptsView = ({ onDone }: PromptsViewProps) => {
 													fontSize: "13px",
 													color: "var(--vscode-descriptionForeground)",
 												}}>
-												You can select an API configuration to always use for enhancing prompts,
-												or just use whatever is currently selected
+												您可以选择始终用于增强提示的API配置，
+												或者只使用当前选择的任何内容
 											</div>
 										</div>
 										<VSCodeDropdown
