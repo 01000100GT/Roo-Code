@@ -189,13 +189,13 @@ export const ModelPicker = ({
 				/>
 			)}
 			<p>
-				The extension automatically fetches the latest list of models available on{" "}
+				扩展程序会自动获取{" "}
 				<VSCodeLink style={{ display: "inline", fontSize: "inherit" }} href={serviceUrl}>
-					{serviceName}.
+					{serviceName}
 				</VSCodeLink>
-				If you're unsure which model to choose, Roo Code works best with{" "}
-				<VSCodeLink onClick={() => onSelect(recommendedModel)}>{recommendedModel}.</VSCodeLink>
-				You can also try searching "free" for no-cost options currently available.
+				上可用的最新模型列表。若不确定选择哪个模型，Roo Code 与{" "}
+				<VSCodeLink onClick={() => onSelect(recommendedModel)}>{recommendedModel}</VSCodeLink>
+				配合效果最佳。您也可以搜索"free"查看当前可用的免费选项。
 			</p>
 			{allowCustomModel && isCustomModel && (
 				<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

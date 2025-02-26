@@ -26,15 +26,12 @@ const WelcomeView = () => {
 
 	return (
 		<div className="flex flex-col min-h-screen px-0 pb-5">
-			<h2>Hi, I'm Roo!</h2>
+			<h2>你好，我是Roo！</h2>
 			<p>
-				I can do all kinds of tasks thanks to the latest breakthroughs in agentic coding capabilities and access
-				to tools that let me create & edit files, explore complex projects, use the browser, and execute
-				terminal commands (with your permission, of course). I can even use MCP to create new tools and extend
-				my own capabilities.
+				我具备智能体编码能力，支持文件创建/编辑、复杂工程解析、浏览器操作、终端指令执行（需授权）等工具调用，并能通过MCP协议实现能力自扩展。
 			</p>
 
-			<b>To get started, this extension needs an API provider.</b>
+			<b>使用前需配置API服务提供方。</b>
 
 			<div className="mt-3">
 				<ApiOptions

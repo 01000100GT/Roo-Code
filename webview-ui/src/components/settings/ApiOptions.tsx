@@ -208,7 +208,7 @@ const ApiOptions = ({
 							marginTop: 3,
 							color: "var(--vscode-descriptionForeground)",
 						}}>
-						This key is stored locally and only used to make API requests from this extension.
+						该密钥仅本地储存，且专用于本扩展的API请求。
 						{!apiConfiguration?.apiKey && (
 							<VSCodeLink
 								href="https://console.anthropic.com/settings/keys"
@@ -244,7 +244,7 @@ const ApiOptions = ({
 							marginTop: "5px",
 							color: "var(--vscode-descriptionForeground)",
 						}}>
-						This key is stored locally and only used to make API requests from this extension.
+						该密钥仅本地储存，且专用于本扩展的API请求。
 					</p>
 				</div>
 			)}
@@ -265,7 +265,7 @@ const ApiOptions = ({
 							marginTop: "5px",
 							color: "var(--vscode-descriptionForeground)",
 						}}>
-						This key is stored locally and only used to make API requests from this extension.
+						该密钥仅本地储存，且专用于本扩展的API请求。
 					</p>
 				</div>
 			)}
@@ -286,7 +286,7 @@ const ApiOptions = ({
 							marginTop: 3,
 							color: "var(--vscode-descriptionForeground)",
 						}}>
-						This key is stored locally and only used to make API requests from this extension.
+						该密钥仅本地储存，且专用于本扩展的API请求。
 						{!apiConfiguration?.openAiNativeApiKey && (
 							<VSCodeLink
 								href="https://platform.openai.com/api-keys"
@@ -314,7 +314,7 @@ const ApiOptions = ({
 							marginTop: 3,
 							color: "var(--vscode-descriptionForeground)",
 						}}>
-						This key is stored locally and only used to make API requests from this extension.
+						该密钥仅本地储存，且专用于本扩展的API请求。
 						<VSCodeLink
 							href="https://console.mistral.ai/"
 							style={{
@@ -376,7 +376,7 @@ const ApiOptions = ({
 							marginTop: "5px",
 							color: "var(--vscode-descriptionForeground)",
 						}}>
-						This key is stored locally and only used to make API requests from this extension.{" "}
+						该密钥仅本地储存，且专用于本扩展的API请求。{" "}
 					</p>
 					{!fromWelcomeView && (
 						<>
@@ -574,7 +574,7 @@ const ApiOptions = ({
 							marginTop: 3,
 							color: "var(--vscode-descriptionForeground)",
 						}}>
-						This key is stored locally and only used to make API requests from this extension.
+						该密钥仅本地储存，且专用于本扩展的API请求。
 						{!apiConfiguration?.geminiApiKey && (
 							<VSCodeLink
 								href="https://ai.google.dev/"
@@ -662,8 +662,9 @@ const ApiOptions = ({
 									margin: "0 0 15px 0",
 									lineHeight: "1.4",
 								}}>
-								Configure the capabilities and pricing for your custom OpenAI-compatible model. <br />
-								Be careful for the model capabilities, as they can affect how Roo Code can work.
+								配置自定义OpenAI兼容模型的功能与计费方案。
+								<br />
+								注意模型功能配置，其设置将直接影响Roo Code的运行效果。
 							</p>
 
 							{/* Capabilities Section */}
@@ -809,8 +810,7 @@ const ApiOptions = ({
 												lineHeight: "1.4",
 												marginBottom: 0,
 											}}>
-											Allows the model to analyze and understand images, essential for visual code
-											assistance
+											启用模型的图像分析与理解能力，该功能为视觉化编程辅助的核心支撑
 										</p>
 									</div>
 
@@ -853,7 +853,7 @@ const ApiOptions = ({
 												lineHeight: "1.4",
 												marginBottom: 0,
 											}}>
-											This model feature is for computer use like sonnet 3.5 support
+											该模型功能专为计算机使用设计，例如支持sonnet 3.5版本
 										</p>
 									</div>
 								</div>
@@ -974,8 +974,8 @@ const ApiOptions = ({
 							color: "var(--vscode-descriptionForeground)",
 						}}>
 						<span style={{ color: "var(--vscode-errorForeground)" }}>
-							(<span style={{ fontWeight: 500 }}>Note:</span> Roo Code uses complex prompts and works best
-							with Claude models. Less capable models may not work as expected.)
+							(<span style={{ fontWeight: 500 }}>Note:</span> Roo
+							Code依赖复杂提示词体系，与Claude系列模型配合可获得最佳效果。性能较低的模型可能无法正常运行。)
 						</span>
 					</p>
 				</div>
@@ -1035,8 +1035,8 @@ const ApiOptions = ({
 						</VSCodeLink>{" "}
 						feature to use it with this extension.{" "}
 						<span style={{ color: "var(--vscode-errorForeground)" }}>
-							(<span style={{ fontWeight: 500 }}>Note:</span> Roo Code uses complex prompts and works best
-							with Claude models. Less capable models may not work as expected.)
+							(<span style={{ fontWeight: 500 }}>Note:</span> Roo
+							Code依赖复杂提示词体系，与Claude系列模型配合可获得最佳效果。性能较低的模型可能无法正常运行。.)
 						</span>
 					</p>
 				</div>
@@ -1058,7 +1058,7 @@ const ApiOptions = ({
 							marginTop: "5px",
 							color: "var(--vscode-descriptionForeground)",
 						}}>
-						This key is stored locally and only used to make API requests from this extension.
+						该密钥仅本地储存，且专用于本扩展的API请求。
 						{!apiConfiguration?.deepSeekApiKey && (
 							<VSCodeLink
 								href="https://platform.deepseek.com/"
@@ -1174,8 +1174,8 @@ const ApiOptions = ({
 							quickstart guide.
 						</VSCodeLink>
 						<span style={{ color: "var(--vscode-errorForeground)" }}>
-							(<span style={{ fontWeight: 500 }}>Note:</span> Roo Code uses complex prompts and works best
-							with Claude models. Less capable models may not work as expected.)
+							(<span style={{ fontWeight: 500 }}>Note:</span> Roo
+							Code依赖复杂提示词体系，与Claude系列模型配合可获得最佳效果。性能较低的模型可能无法正常运行。.)
 						</span>
 					</p>
 				</div>
@@ -1205,7 +1205,7 @@ const ApiOptions = ({
 							marginTop: 3,
 							color: "var(--vscode-descriptionForeground)",
 						}}>
-						This key is stored locally and only used to make API requests from this extension.
+						该密钥仅本地储存，且专用于本扩展的API请求。
 					</p>
 					<UnboundModelPicker />
 				</div>

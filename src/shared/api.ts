@@ -378,7 +378,7 @@ export const glamaDefaultModelInfo: ModelInfo = {
 	cacheWritesPrice: 3.75,
 	cacheReadsPrice: 0.3,
 	description:
-		"Claude 3.7 Sonnet is an advanced large language model with improved reasoning, coding, and problem-solving capabilities. It introduces a hybrid reasoning approach, allowing users to choose between rapid responses and extended, step-by-step processing for complex tasks. The model demonstrates notable improvements in coding, particularly in front-end development and full-stack updates, and excels in agentic workflows, where it can autonomously navigate multi-step processes. Claude 3.7 Sonnet maintains performance parity with its predecessor in standard mode while offering an extended reasoning mode for enhanced accuracy in math, coding, and instruction-following tasks. Read more at the [blog post here](https://www.anthropic.com/news/claude-3-7-sonnet)",
+		"Claude 3.7 Sonnet 是具备增强型推理、编码与问题解决能力的先进大语言模型。该版本创新性地采用混合推理架构，用户可根据需求选择快速响应或深度分步处理模式应对复杂任务。在编码领域，模型显著提升了前端开发与全栈更新能力，并在代理工作流中展现出色自主性，可独立完成多步骤流程操作。标准模式下保持与前代相当的基准性能，同时新增的扩展推理模式显著提升数学运算、代码生成及指令遵循等场景的准确率。 https://www.anthropic.com/news/claude-3-7-sonnet>（点击此处阅读完整博客）",
 }
 
 // Requesty
@@ -395,7 +395,7 @@ export const requestyDefaultModelInfo: ModelInfo = {
 	cacheWritesPrice: 3.75,
 	cacheReadsPrice: 0.3,
 	description:
-		"Claude 3.7 Sonnet is an advanced large language model with improved reasoning, coding, and problem-solving capabilities. It introduces a hybrid reasoning approach, allowing users to choose between rapid responses and extended, step-by-step processing for complex tasks. The model demonstrates notable improvements in coding, particularly in front-end development and full-stack updates, and excels in agentic workflows, where it can autonomously navigate multi-step processes. Claude 3.7 Sonnet maintains performance parity with its predecessor in standard mode while offering an extended reasoning mode for enhanced accuracy in math, coding, and instruction-following tasks. Read more at the [blog post here](https://www.anthropic.com/news/claude-3-7-sonnet)",
+		"Claude 3.7 Sonnet 是具备增强型推理、编码与问题解决能力的先进大语言模型。该版本创新性地采用混合推理架构，用户可根据需求选择快速响应或深度分步处理模式应对复杂任务。在编码领域，模型显著提升了前端开发与全栈更新能力，并在代理工作流中展现出色自主性，可独立完成多步骤流程操作。标准模式下保持与前代相当的基准性能，同时新增的扩展推理模式显著提升数学运算、代码生成及指令遵循等场景的准确率。 https://www.anthropic.com/news/claude-3-7-sonnet>（点击此处阅读完整博客）)",
 }
 
 // OpenRouter
@@ -412,7 +412,7 @@ export const openRouterDefaultModelInfo: ModelInfo = {
 	cacheWritesPrice: 3.75,
 	cacheReadsPrice: 0.3,
 	description:
-		"Claude 3.7 Sonnet is an advanced large language model with improved reasoning, coding, and problem-solving capabilities. It introduces a hybrid reasoning approach, allowing users to choose between rapid responses and extended, step-by-step processing for complex tasks. The model demonstrates notable improvements in coding, particularly in front-end development and full-stack updates, and excels in agentic workflows, where it can autonomously navigate multi-step processes. Claude 3.7 Sonnet maintains performance parity with its predecessor in standard mode while offering an extended reasoning mode for enhanced accuracy in math, coding, and instruction-following tasks. Read more at the [blog post here](https://www.anthropic.com/news/claude-3-7-sonnet)",
+		"Claude 3.7 Sonnet 是具备增强型推理、编码与问题解决能力的先进大语言模型。该版本创新性地采用混合推理架构，用户可根据需求选择快速响应或深度分步处理模式应对复杂任务。在编码领域，模型显著提升了前端开发与全栈更新能力，并在代理工作流中展现出色自主性，可独立完成多步骤流程操作。标准模式下保持与前代相当的基准性能，同时新增的扩展推理模式显著提升数学运算、代码生成及指令遵循等场景的准确率。 https://www.anthropic.com/news/claude-3-7-sonnet>（点击此处阅读完整博客）)",
 }
 
 // Vertex AI
