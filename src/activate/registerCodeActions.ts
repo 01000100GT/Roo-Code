@@ -9,27 +9,27 @@ export const registerCodeActions = (context: vscode.ExtensionContext) => {
 		context,
 		COMMAND_IDS.EXPLAIN,
 		"EXPLAIN",
-		"What would you like Roo to explain?",
-		"E.g. How does the error handling work?",
+		"Roo需要解释什么?", // 提示用户输入想要解释的内容
+		"例如：错误处理是如何工作的?", // 输入框的占位符示例
 	)
 
 	registerCodeActionPair(
 		context,
 		COMMAND_IDS.FIX,
 		"FIX",
-		"What would you like Roo to fix?",
-		"E.g. Maintain backward compatibility",
+		"Roo需要修复什么?", // 提示用户输入想要修复的内容
+		"例如: 维护向后兼容性", // 输入框的占位符示例
 	)
 
 	registerCodeActionPair(
 		context,
 		COMMAND_IDS.IMPROVE,
 		"IMPROVE",
-		"What would you like Roo to improve?",
-		"E.g. Focus on performance optimization",
+		"Roo需要改进什么?", // 提示用户输入想要改进的内容
+		"例如: 专注于性能优化", // 输入框的占位符示例
 	)
 
-	registerCodeAction(context, COMMAND_IDS.ADD_TO_CONTEXT, "ADD_TO_CONTEXT")
+	registerCodeAction(context, COMMAND_IDS.ADD_TO_CONTEXT, "ADD_TO_CONTEXT") // 注册 ADD_TO_CONTEXT 动作
 }
 
 const registerCodeAction = (
@@ -39,28 +39,31 @@ const registerCodeAction = (
 	inputPrompt?: string,
 	inputPlaceholder?: string,
 ) => {
-	let userInput: string | undefined
+	let userInput: string | undefined // 用户输入
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand(command, async (...args: any[]) => {
+			// 注册命令
 			if (inputPrompt) {
+				// 如果有输入提示
 				userInput = await vscode.window.showInputBox({
-					prompt: inputPrompt,
-					placeHolder: inputPlaceholder,
+					prompt: inputPrompt, // 显示提示
+					placeHolder: inputPlaceholder, // 显示占位符
 				})
 			}
 
-			// Handle both code action and direct command cases.
+			// 处理代码动作和直接命令的情况
 			let filePath: string
 			let selectedText: string
 			let diagnostics: any[] | undefined
 
 			if (args.length > 1) {
-				// Called from code action.
+				// 如果有多个参数
+				// 从代码动作调用
 				;[filePath, selectedText, diagnostics] = args
 			} else {
-				// Called directly from command palette.
-				const context = EditorUtils.getEditorContext()
+				// 从命令面板直接调用
+				const context = EditorUtils.getEditorContext() // 获取编辑器上下文
 				if (!context) return
 				;({ filePath, selectedText, diagnostics } = context)
 			}
@@ -71,7 +74,7 @@ const registerCodeAction = (
 				...(userInput ? { userInput } : {}),
 			}
 
-			await ClineProvider.handleCodeAction(command, promptType, params)
+			await ClineProvider.handleCodeAction(command, promptType, params) // 处理代码动作
 		}),
 	)
 }
@@ -83,9 +86,9 @@ const registerCodeActionPair = (
 	inputPrompt?: string,
 	inputPlaceholder?: string,
 ) => {
-	// Register new task version.
+	// 注册新任务版本
 	registerCodeAction(context, baseCommand, promptType, inputPrompt, inputPlaceholder)
 
-	// Register current task version.
+	// 注册当前任务版本
 	registerCodeAction(context, `${baseCommand}InCurrentTask`, promptType, inputPrompt, inputPlaceholder)
 }
