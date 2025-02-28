@@ -2,15 +2,15 @@ import { Anthropic } from "@anthropic-ai/sdk"
 import { MessageContent } from "../../shared/api"
 import { ConversationRole, Message, ContentBlock } from "@aws-sdk/client-bedrock-runtime"
 
-// Import StreamEvent type from bedrock.ts
+// 从 bedrock.ts 导入 StreamEvent 类型
 import { StreamEvent } from "../providers/bedrock"
 
 /**
- * Convert Anthropic messages to Bedrock Converse format
+ * 将 Anthropic 消息转换为 Bedrock Converse 格式
  */
 export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Messages.MessageParam[]): Message[] {
 	return anthropicMessages.map((anthropicMessage) => {
-		// Map Anthropic roles to Bedrock roles
+		// 将 Anthropic 角色映射到 Bedrock 角色
 		const role: ConversationRole = anthropicMessage.role === "assistant" ? "assistant" : "user"
 
 		if (typeof anthropicMessage.content === "string") {
@@ -24,7 +24,7 @@ export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Me
 			}
 		}
 
-		// Process complex content types
+		// 处理复杂内容类型
 		const content = anthropicMessage.content.map((block) => {
 			const messageBlock = block as MessageContent & {
 				id?: string
@@ -40,7 +40,7 @@ export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Me
 			}
 
 			if (messageBlock.type === "image" && messageBlock.source) {
-				// Convert base64 string to byte array if needed
+				// 如果需要，将 base64 字符串转换为字节数组
 				let byteArray: Uint8Array
 				if (typeof messageBlock.source.data === "string") {
 					const binaryString = atob(messageBlock.source.data)
@@ -52,10 +52,10 @@ export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Me
 					byteArray = messageBlock.source.data
 				}
 
-				// Extract format from media_type (e.g., "image/jpeg" -> "jpeg")
+				// 从 media_type 中提取格式（例如，"image/jpeg" -> "jpeg"）
 				const format = messageBlock.source.media_type.split("/")[1]
 				if (!["png", "jpeg", "gif", "webp"].includes(format)) {
-					throw new Error(`Unsupported image format: ${format}`)
+					throw new Error(`不支持的图像格式: ${format}`)
 				}
 
 				return {
@@ -69,7 +69,7 @@ export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Me
 			}
 
 			if (messageBlock.type === "tool_use") {
-				// Convert tool use to XML format
+				// 将工具使用转换为 XML 格式
 				const toolParams = Object.entries(messageBlock.input || {})
 					.map(([key, value]) => `<${key}>\n${value}\n</${key}>`)
 					.join("\n")
@@ -84,7 +84,7 @@ export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Me
 			}
 
 			if (messageBlock.type === "tool_result") {
-				// First try to use content if available
+				// 首先尝试使用内容（如果可用）
 				if (messageBlock.content && Array.isArray(messageBlock.content)) {
 					return {
 						toolResult: {
@@ -97,7 +97,7 @@ export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Me
 					} as ContentBlock
 				}
 
-				// Fall back to output handling if content is not available
+				// 如果内容不可用，则回退到输出处理
 				if (messageBlock.output && typeof messageBlock.output === "string") {
 					return {
 						toolResult: {
@@ -111,7 +111,7 @@ export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Me
 						},
 					} as ContentBlock
 				}
-				// Handle array of content blocks if output is an array
+				// 如果输出是数组，则处理内容块数组
 				if (Array.isArray(messageBlock.output)) {
 					return {
 						toolResult: {
@@ -120,9 +120,9 @@ export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Me
 								if (typeof part === "object" && "text" in part) {
 									return { text: part.text }
 								}
-								// Skip images in tool results as they're handled separately
+								// 跳过工具结果中的图像，因为它们是单独处理的
 								if (typeof part === "object" && "type" in part && part.type === "image") {
-									return { text: "(see following message for image)" }
+									return { text: "(请参阅后续消息中的图像)" }
 								}
 								return { text: String(part) }
 							}),
@@ -131,7 +131,7 @@ export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Me
 					} as ContentBlock
 				}
 
-				// Default case
+				// 默认情况
 				return {
 					toolResult: {
 						toolUseId: messageBlock.tool_use_id || "",
@@ -157,15 +157,15 @@ export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Me
 
 				return {
 					video: {
-						format: "mp4", // Default to mp4, adjust based on actual format if needed
+						format: "mp4", // 默认使用 mp4，根据实际格式进行调整（如果需要）
 						source: videoContent,
 					},
 				} as ContentBlock
 			}
 
-			// Default case for unknown block types
+			// 未知块类型的默认情况
 			return {
-				text: "[Unknown Block Type]",
+				text: "[未知块类型]",
 			} as ContentBlock
 		})
 
@@ -177,16 +177,16 @@ export function convertToBedrockConverseMessages(anthropicMessages: Anthropic.Me
 }
 
 /**
- * Convert Bedrock Converse stream events to Anthropic message format
+ * 将 Bedrock Converse 流事件转换为 Anthropic 消息格式
  */
 export function convertToAnthropicMessage(
 	streamEvent: StreamEvent,
 	modelId: string,
 ): Partial<Anthropic.Messages.Message> {
-	// Handle metadata events
+	// 处理元数据事件
 	if (streamEvent.metadata?.usage) {
 		return {
-			id: "", // Bedrock doesn't provide message IDs
+			id: "", // Bedrock 不提供消息 ID
 			type: "message",
 			role: "assistant",
 			model: modelId,
@@ -197,7 +197,7 @@ export function convertToAnthropicMessage(
 		}
 	}
 
-	// Handle content blocks
+	// 处理内容块
 	const text = streamEvent.contentBlockStart?.start?.text || streamEvent.contentBlockDelta?.delta?.text
 	if (text !== undefined) {
 		return {
@@ -208,7 +208,7 @@ export function convertToAnthropicMessage(
 		}
 	}
 
-	// Handle message stop
+	// 处理消息停止
 	if (streamEvent.messageStop) {
 		return {
 			type: "message",

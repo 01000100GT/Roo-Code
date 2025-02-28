@@ -9,11 +9,11 @@ type Message = OpenAI.Chat.ChatCompletionMessageParam
 type AnthropicMessage = Anthropic.Messages.MessageParam
 
 /**
- * Converts Anthropic messages to OpenAI format while merging consecutive messages with the same role.
- * This is required for DeepSeek Reasoner which does not support successive messages with the same role.
+ * 将 Anthropic 消息转换为 OpenAI 格式，同时合并具有相同角色的连续消息。
+ * 这是因为 DeepSeek Reasoner 不支持具有相同角色的连续消息。
  *
- * @param messages Array of Anthropic messages
- * @returns Array of OpenAI messages where consecutive messages with the same role are combined
+ * @param messages Anthropic 消息数组
+ * @returns OpenAI 消息数组，其中合并了具有相同角色的连续消息
  */
 export function convertToR1Format(messages: AnthropicMessage[]): Message[] {
 	return messages.reduce<Message[]>((merged, message) => {
@@ -21,7 +21,7 @@ export function convertToR1Format(messages: AnthropicMessage[]): Message[] {
 		let messageContent: string | (ContentPartText | ContentPartImage)[] = ""
 		let hasImages = false
 
-		// Convert content to appropriate format
+		// 将内容转换为适当的格式
 		if (Array.isArray(message.content)) {
 			const textParts: string[] = []
 			const imageParts: ContentPartImage[] = []
@@ -53,12 +53,12 @@ export function convertToR1Format(messages: AnthropicMessage[]): Message[] {
 			messageContent = message.content
 		}
 
-		// If last message has same role, merge the content
+		// 如果最后一条消息具有相同的角色，则合并内容
 		if (lastMessage?.role === message.role) {
 			if (typeof lastMessage.content === "string" && typeof messageContent === "string") {
 				lastMessage.content += `\n${messageContent}`
 			}
-			// If either has image content, convert both to array format
+			// 如果其中一个有图像内容，则将两者转换为数组格式
 			else {
 				const lastContent = Array.isArray(lastMessage.content)
 					? lastMessage.content
@@ -77,7 +77,7 @@ export function convertToR1Format(messages: AnthropicMessage[]): Message[] {
 				}
 			}
 		} else {
-			// Add as new message with the correct type based on role
+			// 根据角色添加为新消息
 			if (message.role === "assistant") {
 				const newMessage: AssistantMessage = {
 					role: "assistant",
