@@ -86,9 +86,9 @@ export async function addCustomInstructions(
 		? `
 ====
 
-USER'S CUSTOM INSTRUCTIONS
+用户自定义指令
 
-The following additional instructions are provided by the user, and should be followed to the best of your ability without interfering with the TOOL USE guidelines.
+以下是用户提供的额外指令，请在不干扰工具使用指南的前提下，尽力遵循这些指令。
 
 ${joinedSections}`
 		: ""

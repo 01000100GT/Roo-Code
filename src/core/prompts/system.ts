@@ -43,7 +43,7 @@ async function generatePrompt(
 	enableMcpServerCreation?: boolean,
 ): Promise<string> {
 	if (!context) {
-		throw new Error("Extension context is required for generating system prompt")
+		throw new Error("生成系统提示需要扩展上下文")
 	}
 
 	// If diff is disabled, don't pass the diffStrategy
@@ -109,7 +109,7 @@ export const SYSTEM_PROMPT = async (
 	enableMcpServerCreation?: boolean,
 ): Promise<string> => {
 	if (!context) {
-		throw new Error("Extension context is required for generating system prompt")
+		throw new Error("生成系统提示需要扩展上下文")
 	}
 
 	const getPromptComponent = (value: unknown) => {
