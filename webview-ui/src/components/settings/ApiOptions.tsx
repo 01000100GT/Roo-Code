@@ -691,7 +691,8 @@ const ApiOptions = ({
 														: "var(--vscode-errorForeground)"
 												})(),
 											}}
-											title="Maximum number of tokens the model can generate in a single response"
+											// title="Maximum number of tokens the model can generate in a single response"
+											title="模型在单个响应中可以生成的最大令牌数量"
 											onChange={handleInputChange("openAiCustomModelInfo", (e) => {
 												const value = parseInt((e.target as HTMLInputElement).value)
 												return {
@@ -714,7 +715,7 @@ const ApiOptions = ({
 											}}>
 											<i className="codicon codicon-info" style={{ fontSize: "12px" }}></i>
 											<span>
-												Maximum number of tokens the model can generate in a response. <br />
+												模型在响应中可以生成的最大令牌数量. <br />
 												(-1 is depend on server)
 											</span>
 										</div>
@@ -764,8 +765,7 @@ const ApiOptions = ({
 											}}>
 											<i className="codicon codicon-info" style={{ fontSize: "12px" }}></i>
 											<span>
-												Total tokens (input + output) the model can process. This will help Roo
-												Code run correctly.
+												模型可以处理的总令牌数（输入 + 输出）。这将有助于Roo Code正确运行。
 											</span>
 										</div>
 									</div>
@@ -864,7 +864,7 @@ const ApiOptions = ({
 								<h3 className="font-medium text-sm text-vscode-editor-foreground mb-0">
 									Model Pricing
 								</h3>
-								<div className="text-xs">Configure token-based pricing in USD per million tokens</div>
+								<div className="text-xs">配置基于令牌的定价（每百万令牌的美元价格）</div>
 								<div className="flex flex-row gap-2 mt-1.5">
 									<div className="price-input">
 										<VSCodeTextField

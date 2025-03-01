@@ -352,7 +352,9 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 				</div>
 
 				<div style={{ marginBottom: 40 }}>
-					<h3 style={{ color: "var(--vscode-foreground)", margin: "0 0 15px 0" }}>Auto-Approve(自动授权) Settings</h3>
+					<h3 style={{ color: "var(--vscode-foreground)", margin: "0 0 15px 0" }}>
+						Auto-Approve(自动授权) Settings
+					</h3>
 					<p style={{ fontSize: "12px", marginBottom: 15, color: "var(--vscode-descriptionForeground)" }}>
 						以下设置允许Roo自动执行操作，无需授权。仅当您完全信任AI并了解相关安全性时，才启用这些设置风险。
 					</p>
@@ -380,7 +382,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							<span style={{ fontWeight: "500" }}>Always approve write operations</span>
 						</VSCodeCheckbox>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-						自动创建和编辑文件，无需授权
+							自动创建和编辑文件，无需授权
 						</p>
 						{alwaysAllowWrite && (
 							<div
@@ -475,8 +477,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							<span style={{ fontWeight: "500" }}>Always approve MCP tools</span>
 						</VSCodeCheckbox>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-						自动授权在MCP服务器视图中启用的MCP工具（需要这个
-						设置和MCP工具那里都勾选上“始终允许”复选框）
+							自动授权在MCP服务器视图中启用的MCP工具（需要这个 设置和MCP工具那里都勾选上“始终允许”复选框）
 						</p>
 					</div>
 
@@ -515,8 +516,8 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 										marginTop: "5px",
 										color: "var(--vscode-descriptionForeground)",
 									}}>
-									当"Always approve execute operations"被勾选时可执行的命令前缀。
-									填加 * 以允许所有命令（谨慎使用）。
+									当"Always approve execute operations"被勾选时可执行的命令前缀。 填加 *
+									以允许所有命令（谨慎使用）。
 								</p>
 
 								<div style={{ display: "flex", gap: "5px", marginTop: "10px" }}>
@@ -689,7 +690,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							</div>
 						</div>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-							Minimum time between API requests.
+							API请求之间的最小时间间隔。
 						</p>
 					</div>
 					<div style={{ marginBottom: 15 }}>
@@ -734,8 +735,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							</div>
 						</div>
 						<p style={{ fontSize: "12px", marginTop: "5px", color: "var(--vscode-descriptionForeground)" }}>
-							包含在上下文中的VSCode打开选项卡的最大数量。更高的值提供更多的上下文
-							但增加令牌使用。
+							包含在上下文中的VSCode打开选项卡的最大数量。更高的值提供更多的上下文 但增加令牌使用。
 						</p>
 					</div>
 
@@ -757,7 +757,8 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 								marginTop: "5px",
 								color: "var(--vscode-descriptionForeground)",
 							}}>
-							启用后，Roo将能够更快地编辑文件，并自动拒绝截断的完整文件写入。与最新的Claude 3.7 Sonnet型号配合使用效果最佳。
+							启用后，Roo将能够更快地编辑文件，并自动拒绝截断的完整文件写入。与最新的Claude 3.7
+							Sonnet型号配合使用效果最佳。
 						</p>
 
 						{diffEnabled && (
@@ -826,8 +827,8 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 									marginTop: "5px",
 									color: "var(--vscode-descriptionForeground)",
 								}}>
-								When enabled, Roo will save a checkpoint whenever a file in the workspace is modified,
-								added or deleted, letting you easily revert to a previous state.
+								启用后，每当工作区中的文件被修改、添加或删除时，Roo
+								将保存一个检查点，让您可以轻松地恢复到以前的状态。
 							</p>
 						</div>
 
@@ -880,7 +881,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone },
 							marginTop: "5px",
 							color: "var(--vscode-descriptionForeground)",
 						}}>
-						This will reset all global state and secret storage in the extension.
+						这将重置扩展中的所有全局状态和秘密存储。
 					</p>
 
 					<VSCodeButton

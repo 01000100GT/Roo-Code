@@ -29,19 +29,19 @@ export const ModelInfoView = ({
 		),
 		<ModelInfoSupportsItem
 			isSupported={modelInfo.supportsImages ?? false}
-			supportsLabel="Supports images"
-			doesNotSupportLabel="Does not support images"
+			supportsLabel="支持图像"
+			doesNotSupportLabel="不支持图像"
 		/>,
 		<ModelInfoSupportsItem
 			isSupported={modelInfo.supportsComputerUse ?? false}
-			supportsLabel="Supports computer use"
-			doesNotSupportLabel="Does not support computer use"
+			supportsLabel="支持computer use"
+			doesNotSupportLabel="不支持 computer use"
 		/>,
 		!isGemini && (
 			<ModelInfoSupportsItem
 				isSupported={modelInfo.supportsPromptCache}
-				supportsLabel="Supports prompt caching"
-				doesNotSupportLabel="Does not support prompt caching"
+				supportsLabel="支持 prompt缓存"
+				doesNotSupportLabel="不支持 prompt缓"
 			/>
 		),
 		modelInfo.maxTokens !== undefined && modelInfo.maxTokens > 0 && (
