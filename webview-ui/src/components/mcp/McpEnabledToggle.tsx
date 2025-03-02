@@ -24,7 +24,7 @@ const McpEnabledToggle = () => {
 					marginTop: "5px",
 					color: "var(--vscode-descriptionForeground)",
 				}}>
-				启用后，Roo将能够与MCP服务器交互以实现高级功能。如果你不使用MCP，您可以禁用此功能以减少Roo的令牌使用。
+				启用后,Roo将能够与MCP服务器交互以实现高级功能。如果你不使用MCP,您可以禁用此功能以减少Roo的令牌使用。
 			</p>
 		</div>
 	)
