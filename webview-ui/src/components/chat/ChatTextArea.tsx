@@ -128,7 +128,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					vscode.postMessage(message)
 				} else {
 					const promptDescription =
-						"The 'Enhance Prompt' button helps improve your prompt by providing additional context, clarification, or rephrasing. Try typing a prompt in here and clicking the button again to see how it works."
+						"“增强提示”按钮通过提供额外的上下文、澄清或重新措辞来帮助改进提示。尝试在此处键入提示，然后再次单击按钮以查看其工作原理。"
 					setInputValue(promptDescription)
 				}
 			}
