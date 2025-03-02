@@ -318,6 +318,14 @@ export class Cline {
 	// 与webview通信
 
 	// partial有三种有效状态:true(部分消息),false(部分消息的完成),undefined(单独的完整消息)
+	/**
+	 * 发送请求并等待响应。
+	 *
+	 * @param type - 请求的类型 (ClineAsk 类型)。
+	 * @param text - 可选的文本内容 (string 类型)。
+	 * @param partial - 可选的布尔值，表示是否为部分消息 (boolean 类型)。
+	 * @returns 包含响应、文本和图像的 Promise 对象。
+	 */
 	async ask(
 		type: ClineAsk,
 		text?: string,
