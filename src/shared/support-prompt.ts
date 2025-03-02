@@ -32,7 +32,7 @@ interface SupportPromptConfig {
 
 const supportPromptConfigs: Record<string, SupportPromptConfig> = {
 	ENHANCE: {
-		label: "增强 Prompt",
+		label: "Enhance Prompt",
 		description:
 			"使用即时增强功能为您的输入提供量身定制的建议或改进。这可以确保Roo理解您的意图，并提供最佳的响应。可通过 ✨ 图标在聊天中使用。",
 		template: `Generate an enhanced version of this prompt (reply with only the enhanced prompt - no conversation, explanations, lead-in, bullet points, placeholders, or surrounding quotes):
@@ -40,7 +40,7 @@ const supportPromptConfigs: Record<string, SupportPromptConfig> = {
 \${userInput}`,
 	},
 	EXPLAIN: {
-		label: "解释代码",
+		label: "Explain Code",
 		description:
 			"获取代码片段、函数或整个文件的详细解释。有助于理解复杂代码或学习新模式。在代码操作（编辑器中的灯泡图标）和编辑器上下文菜单（右键单击所选代码）中可用。",
 		template: `Explain the following code from file path @/\${filePath}:
@@ -56,7 +56,7 @@ Please provide a clear and concise explanation of what this code does, including
 3. Important patterns or techniques used`,
 	},
 	FIX: {
-		label: "Fix Issues(解决问题)",
+		label: "Fix Issues",
 		description:
 			"获取识别和解决bug、错误或代码质量问题的帮助。提供解决问题的分步指导。在代码操作（编辑器中的灯泡图标）和编辑器上下文菜单（右键单击所选代码）中可用。",
 		template: `Fix any issues in the following code from file path @/\${filePath}
@@ -74,7 +74,7 @@ Please:
 4. Explain what was fixed and why`,
 	},
 	IMPROVE: {
-		label: "Improve Code(改进代码)",
+		label: "Improve Code",
 		description:
 			"在维护功能的同时，接收代码优化、更好实践和架构改进的建议。在代码操作（编辑器中的灯泡图标）和编辑器上下文菜单（右键单击所选代码）中可用。",
 		template: `Improve the following code from file path @/\${filePath}:
