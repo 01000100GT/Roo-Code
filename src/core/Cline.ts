@@ -3064,18 +3064,18 @@ export class Cline {
 
 			return didEndLoop // 目前始终为 false
 		} catch (error) {
-			// this should never happen since the only thing that can throw an error is the attemptApiRequest, which is wrapped in a try catch that sends an ask where if noButtonClicked, will clear current task and destroy this instance. However to avoid unhandled promise rejection, we will end this loop which will end execution of this instance (see startTask)
-			return true // needs to be true so parent loop knows to end task
+			// 这种情况永远不应该发生，因为唯一可能抛出错误的是 attemptApiRequest，它已经被包裹在一个 try catch 中，如果没有点击按钮，将清除当前任务并销毁这个实例。但是为了避免未处理的 promise rejection，我们将结束这个循环，这将结束这个实例的执行（参见 startTask）
+			return true // 需要为 true 以便父循环知道要结束任务
 		}
 	}
 
 	async loadContext(userContent: UserContent, includeFileDetails: boolean = false) {
 		return await Promise.all([
-			// Process userContent array, which contains various block types:
-			// TextBlockParam, ImageBlockParam, ToolUseBlockParam, and ToolResultBlockParam.
-			// We need to apply parseMentions() to:
-			// 1. All TextBlockParam's text (first user message with task)
-			// 2. ToolResultBlockParam's content/context text arrays if it contains "<feedback>" (see formatToolDeniedFeedback, attemptCompletion, executeCommand, and consecutiveMistakeCount >= 3) or "<answer>" (see askFollowupQuestion), we place all user generated content in these tags so they can effectively be used as markers for when we should parse mentions)
+			// 处理 userContent 数组，它包含各种块类型：
+			// TextBlockParam, ImageBlockParam, ToolUseBlockParam, 和 ToolResultBlockParam。
+			// 我们需要对以下内容应用 parseMentions()：
+			// 1. 所有 TextBlockParam 的文本（第一条带任务的用户消息）
+			// 2. ToolResultBlockParam 的 content/context 文本数组，如果它包含 "<feedback>"（参见 formatToolDeniedFeedback, attemptCompletion, executeCommand, 和 consecutiveMistakeCount >= 3）或 "<answer>"（参见 askFollowupQuestion），我们将所有用户生成的内容放在这些标签中，这样它们可以有效地用作我们应该解析提及的标记）
 			Promise.all(
 				userContent.map(async (block) => {
 					const shouldProcessMentions = (text: string) =>
@@ -3127,7 +3127,7 @@ export class Cline {
 	async getEnvironmentDetails(includeFileDetails: boolean = false) {
 		let details = ""
 
-		// It could be useful for cline to know if the user went from one or no file to another between messages, so we always include this context
+		// 对于 cline 来说，知道用户是否在消息之间从一个文件切换到另一个文件可能很有用，所以我们总是包含这个上下文
 		details += "\n\n# VSCode Visible Files"
 		const visibleFiles = vscode.window.visibleTextEditors
 			?.map((editor) => editor.document?.uri?.fsPath)
@@ -3162,12 +3162,12 @@ export class Cline {
 
 		if (busyTerminals.length > 0 && this.didEditFile) {
 			//  || this.didEditFile
-			await delay(300) // delay after saving file to let terminals catch up
+			await delay(300) // 保存文件后延迟以让终端赶上
 		}
 
 		// let terminalWasBusy = false
 		if (busyTerminals.length > 0) {
-			// wait for terminals to cool down
+			// 等待终端冷却
 			// terminalWasBusy = allTerminals.some((t) => this.terminalManager.isProcessHot(t.id))
 			await pWaitFor(() => busyTerminals.every((t) => !this.terminalManager.isProcessHot(t.id)), {
 				interval: 100,
@@ -3175,29 +3175,29 @@ export class Cline {
 			}).catch(() => {})
 		}
 
-		// we want to get diagnostics AFTER terminal cools down for a few reasons: terminal could be scaffolding a project, dev servers (compilers like webpack) will first re-compile and then send diagnostics, etc
+		// 我们想在终端冷却后获取诊断信息，原因有几个：终端可能正在搭建项目，开发服务器（如 webpack 编译器）将首先重新编译然后发送诊断信息等
 		/*
 		let diagnosticsDetails = ""
-		const diagnostics = await this.diagnosticsMonitor.getCurrentDiagnostics(this.didEditFile || terminalWasBusy) // if cline ran a command (ie npm install) or edited the workspace then wait a bit for updated diagnostics
+		const diagnostics = await this.diagnosticsMonitor.getCurrentDiagnostics(this.didEditFile || terminalWasBusy) // 如果 cline 运行了命令（如 npm install）或编辑了工作区，则等待一段时间以获取更新的诊断信息
 		for (const [uri, fileDiagnostics] of diagnostics) {
 			const problems = fileDiagnostics.filter((d) => d.severity === vscode.DiagnosticSeverity.Error)
 			if (problems.length > 0) {
 				diagnosticsDetails += `\n## ${path.relative(cwd, uri.fsPath)}`
 				for (const diagnostic of problems) {
 					// let severity = diagnostic.severity === vscode.DiagnosticSeverity.Error ? "Error" : "Warning"
-					const line = diagnostic.range.start.line + 1 // VSCode lines are 0-indexed
+					const line = diagnostic.range.start.line + 1 // VSCode 行号从 0 开始
 					const source = diagnostic.source ? `[${diagnostic.source}] ` : ""
 					diagnosticsDetails += `\n- ${source}Line ${line}: ${diagnostic.message}`
 				}
 			}
 		}
 		*/
-		this.didEditFile = false // reset, this lets us know when to wait for saved files to update terminals
+		this.didEditFile = false // 重置，这让我们知道何时需要等待已保存文件更新终端
 
-		// waiting for updated diagnostics lets terminal output be the most up-to-date possible
+		// 等待更新的诊断信息让终端输出尽可能是最新的
 		let terminalDetails = ""
 		if (busyTerminals.length > 0) {
-			// terminals are cool, let's retrieve their output
+			// 终端已冷却，让我们获取它们的输出
 			terminalDetails += "\n\n# Actively Running Terminals"
 			for (const busyTerminal of busyTerminals) {
 				terminalDetails += `\n## Original command: \`${busyTerminal.lastCommand}\``
@@ -3205,11 +3205,11 @@ export class Cline {
 				if (newOutput) {
 					terminalDetails += `\n### New Output\n${newOutput}`
 				} else {
-					// details += `\n(Still running, no new output)` // don't want to show this right after running the command
+					// details += `\n(Still running, no new output)` // 不想在运行命令后立即显示这个
 				}
 			}
 		}
-		// only show inactive terminals if there's output to show
+		// 只在有输出要显示时显示非活动终端
 		if (inactiveTerminals.length > 0) {
 			const inactiveTerminalOutputs = new Map<number, string>()
 			for (const inactiveTerminal of inactiveTerminals) {
@@ -3241,7 +3241,7 @@ export class Cline {
 			details += terminalDetails
 		}
 
-		// Add current time information with timezone
+		// 添加当前时间信息和时区
 		const now = new Date()
 		const formatter = new Intl.DateTimeFormat(undefined, {
 			year: "numeric",
@@ -3253,11 +3253,11 @@ export class Cline {
 			hour12: true,
 		})
 		const timeZone = formatter.resolvedOptions().timeZone
-		const timeZoneOffset = -now.getTimezoneOffset() / 60 // Convert to hours and invert sign to match conventional notation
+		const timeZoneOffset = -now.getTimezoneOffset() / 60 // 转换为小时并反转符号以匹配常规表示法
 		const timeZoneOffsetStr = `${timeZoneOffset >= 0 ? "+" : ""}${timeZoneOffset}:00`
 		details += `\n\n# Current Time\n${formatter.format(now)} (${timeZone}, UTC${timeZoneOffsetStr})`
 
-		// Add context tokens information
+		// 添加上下文令牌信息
 		const { contextTokens } = getApiMetrics(this.clineMessages)
 		const modelInfo = this.api.getModel().info
 		const contextWindow = modelInfo.contextWindow
@@ -3265,7 +3265,7 @@ export class Cline {
 			contextTokens && contextWindow ? Math.round((contextTokens / contextWindow) * 100) : undefined
 		details += `\n\n# Current Context Size (Tokens)\n${contextTokens ? `${contextTokens.toLocaleString()} (${contextPercentage}%)` : "(Not available)"}`
 
-		// Add current mode and any mode-specific warnings
+		// 添加当前模式和任何模式特定的警告
 		const {
 			mode,
 			customModes,
@@ -3290,7 +3290,7 @@ export class Cline {
 			}
 		}
 
-		// Add warning if not in code mode
+		// 如果不在代码模式下添加警告
 		if (
 			!isToolAllowedForMode("write_to_file", currentMode, customModes ?? [], {
 				apply_diff: this.diffEnabled,
@@ -3306,7 +3306,7 @@ export class Cline {
 			details += `\n\n# Current Working Directory (${cwd.toPosix()}) Files\n`
 			const isDesktop = arePathsEqual(cwd, path.join(os.homedir(), "Desktop"))
 			if (isDesktop) {
-				// don't want to immediately access desktop since it would show permission popup
+				// 不想立即访问桌面，因为这会显示权限弹窗
 				details += "(Desktop files not shown automatically. Use list_files to explore if needed.)"
 			} else {
 				const [files, didHitLimit] = await listFiles(cwd, true, 200)
@@ -3318,7 +3318,7 @@ export class Cline {
 		return `<environment_details>\n${details.trim()}\n</environment_details>`
 	}
 
-	// Checkpoints
+	// 检查点
 
 	private async getCheckpointService() {
 		if (!this.checkpointsEnabled) {
@@ -3469,7 +3469,7 @@ export class Cline {
 
 				await this.overwriteClineMessages(this.clineMessages.slice(0, index + 1))
 
-				// TODO: Verify that this is working as expected.
+				// TODO: 验证这是否按预期工作。
 				await this.say(
 					"api_req_deleted",
 					JSON.stringify({
@@ -3482,16 +3482,15 @@ export class Cline {
 				)
 			}
 
-			// The task is already cancelled by the provider beforehand, but we
-			// need to re-init to get the updated messages.
+			// 任务已经被提供者提前取消，但我们
+			// 需要重新初始化以获取更新的消息。
 			//
-			// This was take from Cline's implementation of the checkpoints
-			// feature. The cline instance will hang if we don't cancel twice,
-			// so this is currently necessary, but it seems like a complicated
-			// and hacky solution to a problem that I don't fully understand.
-			// I'd like to revisit this in the future and try to improve the
-			// task flow and the communication between the webview and the
-			// Cline instance.
+			// 这是从 Cline 的检查点功能实现中获取的。
+			// 如果我们不取消两次，cline 实例将会挂起，
+			// 所以这目前是必要的，但这似乎是一个复杂的
+			// 和黑客式的解决方案，我还不完全理解这个问题。
+			// 我想在将来重新审视这个问题，并尝试改进
+			// 任务流程和 webview 与 Cline 实例之间的通信。
 			this.providerRef.deref()?.cancelTask()
 		} catch (err) {
 			this.providerRef.deref()?.log("[checkpointRestore] disabling checkpoints for this task")
