@@ -7,13 +7,13 @@ import {
 	ListToolsResultSchema,
 	ReadResourceResultSchema,
 } from "@modelcontextprotocol/sdk/types.js"
-import chokidar, { FSWatcher } from "chokidar"
+import chokidar, { FSWatcher } from "chokidar" //Chokidar 是一个用于监视文件系统变化的库，FSWatcher 是其内部使用的文件监视器类
 import delay from "delay"
 import deepEqual from "fast-deep-equal"
 import * as fs from "fs/promises"
 import * as path from "path"
 import * as vscode from "vscode"
-import { z } from "zod"
+import { z } from "zod" //Zod 是一个 TypeScript 首选的 schema 验证库，能够帮助开发者确保数据结构的正确性
 import { ClineProvider, GlobalFileNames } from "../../core/webview/ClineProvider"
 import {
 	McpResource,
