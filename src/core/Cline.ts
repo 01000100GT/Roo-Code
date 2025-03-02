@@ -66,7 +66,7 @@ import { insertGroups } from "./diff/insert-groups"
 import { EXPERIMENT_IDS, experiments as Experiments, ExperimentId } from "../shared/experiments"
 
 const cwd =
-	vscode.workspace.workspaceFolders?.map((folder) => folder.uri.fsPath).at(0) ?? path.join(os.homedir(), "Desktop") // may or may not exist but fs checking existence would immediately ask for permission which would be bad UX, need to come up with a better solution
+	vscode.workspace.workspaceFolders?.map((folder) => folder.uri.fsPath).at(0) ?? path.join(os.homedir(), "Desktop") // 可能存在也可能不存在,但fs检查存在会立即请求权限导致不好的用户体验,需要想出更好的解决方案
 
 type ToolResponse = string | Array<Anthropic.TextBlockParam | Anthropic.ImageBlockParam>
 type UserContent = Array<
@@ -115,11 +115,11 @@ export class Cline {
 	private lastApiRequestTime?: number
 	isInitialized = false
 
-	// checkpoints
+	// 检查点
 	checkpointsEnabled: boolean = false
 	private checkpointService?: CheckpointService
 
-	// streaming
+	// 流式传输
 	isWaitingForFirstChunk = false
 	isStreaming = false
 	private currentStreamingContentIndex = 0
@@ -165,7 +165,7 @@ export class Cline {
 			this.taskId = historyItem.id
 		}
 
-		// Initialize diffStrategy based on current state
+		// 根据当前状态初始化diffStrategy
 		this.updateDiffStrategy(Experiments.isEnabled(experiments ?? {}, EXPERIMENT_IDS.DIFF_STRATEGY))
 
 		if (startTask) {
@@ -195,9 +195,9 @@ export class Cline {
 		return [instance, promise]
 	}
 
-	// Add method to update diffStrategy
+	// 添加更新diffStrategy的方法
 	async updateDiffStrategy(experimentalDiffStrategy?: boolean) {
-		// If not provided, get from current state
+		// 如果未提供,从当前状态获取
 		if (experimentalDiffStrategy === undefined) {
 			const { experiments: stateExperimental } = (await this.providerRef.deref()?.getState()) ?? {}
 			experimentalDiffStrategy = stateExperimental?.[EXPERIMENT_IDS.DIFF_STRATEGY] ?? false
@@ -205,7 +205,7 @@ export class Cline {
 		this.diffStrategy = getDiffStrategy(this.api.getModel().id, this.fuzzyMatchThreshold, experimentalDiffStrategy)
 	}
 
-	// Storing task to disk for history
+	// 将任务存储到磁盘以供历史记录
 
 	private async ensureTaskDirectoryExists(): Promise<string> {
 		const globalStoragePath = this.providerRef.deref()?.context.globalStorageUri.fsPath
@@ -242,7 +242,7 @@ export class Cline {
 			const filePath = path.join(await this.ensureTaskDirectoryExists(), GlobalFileNames.apiConversationHistory)
 			await fs.writeFile(filePath, JSON.stringify(this.apiConversationHistory))
 		} catch (error) {
-			// in the off chance this fails, we don't want to stop the task
+			// 如果这个操作失败了,我们不想停止任务
 			console.error("Failed to save API conversation history:", error)
 		}
 	}
@@ -252,11 +252,11 @@ export class Cline {
 		if (await fileExistsAtPath(filePath)) {
 			return JSON.parse(await fs.readFile(filePath, "utf8"))
 		} else {
-			// check old location
+			// 检查旧位置
 			const oldPath = path.join(await this.ensureTaskDirectoryExists(), "claude_messages.json")
 			if (await fileExistsAtPath(oldPath)) {
 				const data = JSON.parse(await fs.readFile(oldPath, "utf8"))
-				await fs.unlink(oldPath) // remove old file
+				await fs.unlink(oldPath) // 删除旧文件
 				return data
 			}
 		}
@@ -278,9 +278,9 @@ export class Cline {
 			const taskDir = await this.ensureTaskDirectoryExists()
 			const filePath = path.join(taskDir, GlobalFileNames.uiMessages)
 			await fs.writeFile(filePath, JSON.stringify(this.clineMessages))
-			// combined as they are in ChatView
+			// 与ChatView中的组合方式相同
 			const apiMetrics = getApiMetrics(combineApiRequests(combineCommandSequences(this.clineMessages.slice(1))))
-			const taskMessage = this.clineMessages[0] // first message is always the task say
+			const taskMessage = this.clineMessages[0] // 第一条消息总是任务说明
 			const lastRelevantMessage =
 				this.clineMessages[
 					findLastIndex(
@@ -315,15 +315,15 @@ export class Cline {
 		}
 	}
 
-	// Communicate with webview
+	// 与webview通信
 
-	// partial has three valid states true (partial message), false (completion of partial message), undefined (individual complete message)
+	// partial有三种有效状态:true(部分消息),false(部分消息的完成),undefined(单独的完整消息)
 	async ask(
 		type: ClineAsk,
 		text?: string,
 		partial?: boolean,
 	): Promise<{ response: ClineAskResponse; text?: string; images?: string[] }> {
-		// If this Cline instance was aborted by the provider, then the only thing keeping us alive is a promise still running in the background, in which case we don't want to send its result to the webview as it is attached to a new instance of Cline now. So we can safely ignore the result of any active promises, and this class will be deallocated. (Although we set Cline = undefined in provider, that simply removes the reference to this instance, but the instance is still alive until this promise resolves or rejects.)
+		// 如果这个Cline实例被provider中止,那么唯一保持我们活着的就是后台运行的promise,在这种情况下我们不想将其结果发送到webview,因为它现在已经附加到一个新的Cline实例。所以我们可以安全地忽略任何活动promise的结果,这个类将被释放。(虽然我们在provider中设置Cline = undefined,但这只是删除了对这个实例的引用,但实例仍然存在,直到这个promise解决或拒绝。)
 		if (this.abort) {
 			throw new Error("Roo Code instance aborted")
 		}
@@ -334,10 +334,10 @@ export class Cline {
 				lastMessage && lastMessage.partial && lastMessage.type === "ask" && lastMessage.ask === type
 			if (partial) {
 				if (isUpdatingPreviousPartial) {
-					// existing partial message, so update it
+					// 更新现有的部分消息
 					lastMessage.text = text
 					lastMessage.partial = partial
-					// todo be more efficient about saving and posting only new data or one whole message at a time so ignore partial for saves, and only post parts of partial message instead of whole array in new listener
+					// todo 更高效地保存和只发送新数据或一次发送一整条消息,所以忽略部分保存,并且只发送部分消息的部分而不是在新监听器中发送整个数组
 					// await this.saveClineMessages()
 					// await this.providerRef.deref()?.postStateToWebview()
 					await this.providerRef
@@ -345,7 +345,7 @@ export class Cline {
 						?.postMessageToWebview({ type: "partialMessage", partialMessage: lastMessage })
 					throw new Error("Current ask promise was ignored 1")
 				} else {
-					// this is a new partial message, so add it with partial state
+					// 这是一个新的部分消息,所以添加它并设置部分状态
 					// this.askResponse = undefined
 					// this.askResponseText = undefined
 					// this.askResponseImages = undefined
@@ -356,18 +356,18 @@ export class Cline {
 					throw new Error("Current ask promise was ignored 2")
 				}
 			} else {
-				// partial=false means its a complete version of a previously partial message
+				// partial=false 表示这是之前部分消息的完整版本
 				if (isUpdatingPreviousPartial) {
-					// this is the complete version of a previously partial message, so replace the partial with the complete version
+					// 这是之前部分消息的完整版本,所以用完整版本替换部分版本
 					this.askResponse = undefined
 					this.askResponseText = undefined
 					this.askResponseImages = undefined
 
 					/*
-					Bug for the history books:
-					In the webview we use the ts as the chatrow key for the virtuoso list. Since we would update this ts right at the end of streaming, it would cause the view to flicker. The key prop has to be stable otherwise react has trouble reconciling items between renders, causing unmounting and remounting of components (flickering).
-					The lesson here is if you see flickering when rendering lists, it's likely because the key prop is not stable.
-					So in this case we must make sure that the message ts is never altered after first setting it.
+					历史上的Bug:
+					在webview中我们使用ts作为virtuoso列表的chatrow键。由于我们会在流式传输结束时更新这个ts,它会导致视图闪烁。如果key prop不稳定,react在渲染之间会难以协调项目,导致组件的卸载和重新挂载(闪烁)。
+					这里的教训是如果你看到列表渲染时闪烁,很可能是因为key prop不稳定。
+					所以在这种情况下,我们必须确保消息ts在第一次设置后永远不会改变。
 					*/
 					askTs = lastMessage.ts
 					this.lastMessageTs = askTs
@@ -380,7 +380,7 @@ export class Cline {
 						.deref()
 						?.postMessageToWebview({ type: "partialMessage", partialMessage: lastMessage })
 				} else {
-					// this is a new partial=false message, so add it like normal
+					// 这是一个新的partial=false消息,所以像正常一样添加它
 					this.askResponse = undefined
 					this.askResponseText = undefined
 					this.askResponseImages = undefined
@@ -391,7 +391,7 @@ export class Cline {
 				}
 			}
 		} else {
-			// this is a new non-partial message, so add it like normal
+			// 这是一个新的非部分消息,所以像正常一样添加它
 			// const lastMessage = this.clineMessages.at(-1)
 			this.askResponse = undefined
 			this.askResponseText = undefined
@@ -404,7 +404,7 @@ export class Cline {
 
 		await pWaitFor(() => this.askResponse !== undefined || this.lastMessageTs !== askTs, { interval: 100 })
 		if (this.lastMessageTs !== askTs) {
-			throw new Error("Current ask promise was ignored") // could happen if we send multiple asks in a row i.e. with command_output. It's important that when we know an ask could fail, it is handled gracefully
+			throw new Error("Current ask promise was ignored") // 如果我们连续发送多个ask可能会发生这种情况,比如command_output。重要的是当我们知道一个ask可能会失败时,它要被优雅地处理
 		}
 		const result = { response: this.askResponse!, text: this.askResponseText, images: this.askResponseImages }
 		this.askResponse = undefined
@@ -436,7 +436,7 @@ export class Cline {
 				lastMessage && lastMessage.partial && lastMessage.type === "say" && lastMessage.say === type
 			if (partial) {
 				if (isUpdatingPreviousPartial) {
-					// existing partial message, so update it
+					// 更新现有的部分消息
 					lastMessage.text = text
 					lastMessage.images = images
 					lastMessage.partial = partial
@@ -444,30 +444,30 @@ export class Cline {
 						.deref()
 						?.postMessageToWebview({ type: "partialMessage", partialMessage: lastMessage })
 				} else {
-					// this is a new partial message, so add it with partial state
+					// 这是一个新的部分消息,所以添加它并设置部分状态
 					const sayTs = Date.now()
 					this.lastMessageTs = sayTs
 					await this.addToClineMessages({ ts: sayTs, type: "say", say: type, text, images, partial })
 					await this.providerRef.deref()?.postStateToWebview()
 				}
 			} else {
-				// partial=false means its a complete version of a previously partial message
+				// partial=false 表示这是之前部分消息的完整版本
 				if (isUpdatingPreviousPartial) {
-					// this is the complete version of a previously partial message, so replace the partial with the complete version
+					// 这是之前部分消息的完整版本,所以用完整版本替换部分版本
 					this.lastMessageTs = lastMessage.ts
 					// lastMessage.ts = sayTs
 					lastMessage.text = text
 					lastMessage.images = images
 					lastMessage.partial = false
 
-					// instead of streaming partialMessage events, we do a save and post like normal to persist to disk
+					// 不是流式传输partialMessage事件,我们像正常一样执行保存和发布以持久化到磁盘
 					await this.saveClineMessages()
 					// await this.providerRef.deref()?.postStateToWebview()
 					await this.providerRef
 						.deref()
-						?.postMessageToWebview({ type: "partialMessage", partialMessage: lastMessage }) // more performant than an entire postStateToWebview
+						?.postMessageToWebview({ type: "partialMessage", partialMessage: lastMessage }) // 比整个postStateToWebview更高效
 				} else {
-					// this is a new partial=false message, so add it like normal
+					// 这是一个新的partial=false消息,所以像正常一样添加它
 					const sayTs = Date.now()
 					this.lastMessageTs = sayTs
 					await this.addToClineMessages({ ts: sayTs, type: "say", say: type, text, images })
@@ -475,7 +475,7 @@ export class Cline {
 				}
 			}
 		} else {
-			// this is a new non-partial message, so add it like normal
+			// 这是一个新的非部分消息,所以像正常一样添加它
 			const sayTs = Date.now()
 			this.lastMessageTs = sayTs
 			await this.addToClineMessages({ ts: sayTs, type: "say", say: type, text, images, checkpoint })
@@ -493,11 +493,11 @@ export class Cline {
 		return formatResponse.toolError(formatResponse.missingToolParameterError(paramName))
 	}
 
-	// Task lifecycle
+	// 任务生命周期
 
 	private async startTask(task?: string, images?: string[]): Promise<void> {
-		// conversationHistory (for API) and clineMessages (for webview) need to be in sync
-		// if the extension process were killed, then on restart the clineMessages might not be empty, so we need to set it to [] when we create a new Cline client (otherwise webview would show stale messages from previous session)
+		// conversationHistory (用于API)和clineMessages (用于webview)需要保持同步
+		// 如果扩展进程被杀死,那么在重启时clineMessages可能不为空,所以当我们创建一个新的Cline客户端时需要将其设置为[] (否则webview会显示上一个会话的过时消息)
 		this.clineMessages = []
 		this.apiConversationHistory = []
 		await this.providerRef.deref()?.postStateToWebview()
@@ -518,7 +518,7 @@ export class Cline {
 	private async resumeTaskFromHistory() {
 		const modifiedClineMessages = await this.getSavedClineMessages()
 
-		// Remove any resume messages that may have been added before
+		// 删除之前可能添加的任何恢复消息
 		const lastRelevantMessageIndex = findLastIndex(
 			modifiedClineMessages,
 			(m) => !(m.ask === "resume_task" || m.ask === "resume_completed_task"),
@@ -527,7 +527,7 @@ export class Cline {
 			modifiedClineMessages.splice(lastRelevantMessageIndex + 1)
 		}
 
-		// since we don't use api_req_finished anymore, we need to check if the last api_req_started has a cost value, if it doesn't and no cancellation reason to present, then we remove it since it indicates an api request without any partial content streamed
+		// 由于我们不再使用api_req_finished,我们需要检查最后一个api_req_started是否有cost值,如果没有且没有取消原因要显示,那么我们删除它,因为它表示一个没有任何部分内容流式传输的api请求
 		const lastApiReqStartedIndex = findLastIndex(
 			modifiedClineMessages,
 			(m) => m.type === "say" && m.say === "api_req_started",
@@ -543,20 +543,16 @@ export class Cline {
 		await this.overwriteClineMessages(modifiedClineMessages)
 		this.clineMessages = await this.getSavedClineMessages()
 
-		// Now present the cline messages to the user and ask if they want to
-		// resume (NOTE: we ran into a bug before where the
-		// apiConversationHistory wouldn't be initialized when opening a old
-		// task, and it was because we were waiting for resume).
-		// This is important in case the user deletes messages without resuming
-		// the task first.
+		// 现在向用户展示cline消息并询问他们是否要恢复(注意:我们之前遇到一个bug,当打开一个旧任务时apiConversationHistory不会被初始化,这是因为我们在等待恢复)。
+		// 这很重要,以防用户在恢复任务之前删除消息。
 		this.apiConversationHistory = await this.getSavedApiConversationHistory()
 
 		const lastClineMessage = this.clineMessages
 			.slice()
 			.reverse()
-			.find((m) => !(m.ask === "resume_task" || m.ask === "resume_completed_task")) // could be multiple resume tasks
+			.find((m) => !(m.ask === "resume_task" || m.ask === "resume_completed_task")) // 可能有多个恢复任务
 		// const lastClineMessage = this.clineMessages[lastClineMessageIndex]
-		// could be a completion result with a command
+		// 可能是带有命令的完成结果
 		// const secondLastClineMessage = this.clineMessages
 		// 	.slice()
 		// 	.reverse()
@@ -575,7 +571,7 @@ export class Cline {
 
 		this.isInitialized = true
 
-		const { response, text, images } = await this.ask(askType) // calls poststatetowebview
+		const { response, text, images } = await this.ask(askType) // 调用poststatetowebview
 		let responseText: string | undefined
 		let responseImages: string[] | undefined
 		if (response === "messageResponse") {
@@ -584,17 +580,16 @@ export class Cline {
 			responseImages = images
 		}
 
-		// Make sure that the api conversation history can be resumed by the API,
-		// even if it goes out of sync with cline messages.
+		// 确保API对话历史可以被API恢复,即使它与cline消息不同步。
 		let existingApiConversationHistory: Anthropic.Messages.MessageParam[] =
 			await this.getSavedApiConversationHistory()
 
-		// v2.0 xml tags refactor caveat: since we don't use tools anymore, we need to replace all tool use blocks with a text block since the API disallows conversations with tool uses and no tool schema
+		// v2.0 xml标签重构注意事项:由于我们不再使用工具,我们需要将所有工具使用块替换为文本块,因为API不允许没有工具模式的对话中使用工具
 		const conversationWithoutToolBlocks = existingApiConversationHistory.map((message) => {
 			if (Array.isArray(message.content)) {
 				const newContent = message.content.map((block) => {
 					if (block.type === "tool_use") {
-						// it's important we convert to the new tool schema format so the model doesn't get confused about how to invoke tools
+						// 重要的是我们转换为新的工具模式格式,这样模型就不会对如何调用工具感到困惑
 						const inputAsXml = Object.entries(block.input as Record<string, string>)
 							.map(([key, value]) => `<${key}>\n${value}\n</${key}>`)
 							.join("\n")
@@ -603,7 +598,7 @@ export class Cline {
 							text: `<${block.name}>\n${inputAsXml}\n</${block.name}>`,
 						} as Anthropic.Messages.TextBlockParam
 					} else if (block.type === "tool_result") {
-						// Convert block.content to text block array, removing images
+						// 将block.content转换为文本块数组,删除图片
 						const contentAsTextBlocks = Array.isArray(block.content)
 							? block.content.filter((item) => item.type === "text")
 							: [{ type: "text", text: block.content }]
@@ -622,16 +617,16 @@ export class Cline {
 		})
 		existingApiConversationHistory = conversationWithoutToolBlocks
 
-		// FIXME: remove tool use blocks altogether
+		// FIXME: 完全删除工具使用块
 
-		// if the last message is an assistant message, we need to check if there's tool use since every tool use has to have a tool response
-		// if there's no tool use and only a text block, then we can just add a user message
-		// (note this isn't relevant anymore since we use custom tool prompts instead of tool use blocks, but this is here for legacy purposes in case users resume old tasks)
+		// 如果最后一条消息是助手消息，我们需要检查是否有工具使用，因为每个工具使用都必须有一个工具响应
+		// 如果没有工具使用且只有一个文本块，那么我们就可以直接添加一个用户消息
+		// (注意这不再相关，因为我们现在使用自定义工具提示而不是工具使用块，但这里保留是为了在用户恢复旧任务时的遗留目的)
 
-		// if the last message is a user message, we can need to get the assistant message before it to see if it made tool calls, and if so, fill in the remaining tool responses with 'interrupted'
+		// 如果最后一条消息是用户消息，我们需要获取它之前的助手消息，看看它是否进行了工具调用，如果是的话，用'interrupted'填充剩余的工具响应
 
-		let modifiedOldUserContent: UserContent // either the last message if its user message, or the user message before the last (assistant) message
-		let modifiedApiConversationHistory: Anthropic.Messages.MessageParam[] // need to remove the last user message to replace with new modified user message
+		let modifiedOldUserContent: UserContent // 要么是最后一条消息(如果是用户消息),要么是最后一条(助手)消息之前的用户消息
+		let modifiedApiConversationHistory: Anthropic.Messages.MessageParam[] // 需要删除最后一条用户消息以替换为新的修改后的用户消息
 		if (existingApiConversationHistory.length > 0) {
 			const lastMessage = existingApiConversationHistory[existingApiConversationHistory.length - 1]
 
@@ -756,12 +751,12 @@ export class Cline {
 			const didEndLoop = await this.recursivelyMakeClineRequests(nextUserContent, includeFileDetails)
 			includeFileDetails = false // we only need file details the first time
 
-			//  The way this agentic loop works is that cline will be given a task that he then calls tools to complete. unless there's an attempt_completion call, we keep responding back to him with his tool's responses until he either attempt_completion or does not use anymore tools. If he does not use anymore tools, we ask him to consider if he's completed the task and then call attempt_completion, otherwise proceed with completing the task.
-			// There is a MAX_REQUESTS_PER_TASK limit to prevent infinite requests, but Cline is prompted to finish the task as efficiently as he can.
+			//  这个代理循环的工作方式是:给cline一个任务,然后他调用工具来完成。除非有attempt_completion调用,我们会一直用工具的响应回复他,直到他要么attempt_completion要么不再使用任何工具。如果他不再使用任何工具,我们会让他考虑是否已完成任务,然后调用attempt_completion,否则继续完成任务。
+			// 有一个MAX_REQUESTS_PER_TASK限制来防止无限请求,但Cline被提示尽可能高效地完成任务。
 
 			//const totalCost = this.calculateApiCost(totalInputTokens, totalOutputTokens)
 			if (didEndLoop) {
-				// For now a task never 'completes'. This will only happen if the user hits max requests and denies resetting the count.
+				// 目前任务永远不会"完成"。这只会在用户达到最大请求数并拒绝重置计数时发生。
 				//this.say("task_completed", `Task completed. Total API usage cost: ${totalCost}`)
 				break
 			} else {
@@ -781,7 +776,7 @@ export class Cline {
 	}
 
 	async abortTask(isAbandoned = false) {
-		// Will stop any autonomously running promises.
+		// 将停止任何自主运行的承诺。
 		if (isAbandoned) {
 			this.abandoned = true
 		}
@@ -792,8 +787,7 @@ export class Cline {
 		this.urlContentFetcher.closeBrowser()
 		this.browserSession.closeBrowser()
 
-		// If we're not streaming then `abortStream` (which reverts the diff
-		// view changes) won't be called, so we need to revert the changes here.
+		// 如果我们不是在流式传输,那么`abortStream`(它会恢复差异视图更改)不会被调用,所以我们需要在这里恢复更改。
 		if (this.isStreaming && this.diffViewProvider.isEditing) {
 			await this.diffViewProvider.revertChanges()
 		}
@@ -803,7 +797,7 @@ export class Cline {
 
 	async executeCommandTool(command: string): Promise<[boolean, ToolResponse]> {
 		const terminalInfo = await this.terminalManager.getOrCreateTerminal(cwd)
-		terminalInfo.terminal.show() // weird visual bug when creating new terminals (even manually) where there's an empty space at the top.
+		terminalInfo.terminal.show() // 创建新终端时的奇怪视觉错误(即使手动创建),顶部有一个空白区域。
 		const process = this.terminalManager.runCommand(terminalInfo, command)
 
 		let userFeedback: { text?: string; images?: string[] } | undefined
@@ -812,14 +806,14 @@ export class Cline {
 			try {
 				const { response, text, images } = await this.ask("command_output", line)
 				if (response === "yesButtonClicked") {
-					// proceed while running
+					// 在运行时继续
 				} else {
 					userFeedback = { text, images }
 				}
 				didContinue = true
-				process.continue() // continue past the await
+				process.continue() // 继续执行await
 			} catch {
-				// This can only happen if this ask promise was ignored, so ignore this error
+				// 这只能在这个ask承诺被忽略时发生,所以忽略这个错误
 			}
 		}
 
@@ -844,11 +838,10 @@ export class Cline {
 
 		await process
 
-		// Wait for a short delay to ensure all messages are sent to the webview
-		// This delay allows time for non-awaited promises to be created and
-		// for their associated messages to be sent to the webview, maintaining
-		// the correct order of messages (although the webview is smart about
-		// grouping command_output messages despite any gaps anyways)
+		// 等待短暂延迟以确保所有消息都发送到webview
+		// 这个延迟允许非等待的承诺被创建,并且它们相关的消息被发送到webview,
+		// 保持消息的正确顺序(尽管webview在分组command_output消息时很智能,
+		// 即使有任何间隙)
 		await delay(50)
 
 		const { terminalOutputLineLimit } = (await this.providerRef.deref()?.getState()) ?? {}
@@ -888,7 +881,7 @@ export class Cline {
 
 		let rateLimitDelay = 0
 
-		// Only apply rate limiting if this isn't the first request
+		// 仅在这不是第一个请求时应用速率限制
 		if (this.lastApiRequestTime) {
 			const now = Date.now()
 			const timeSinceLastRequest = now - this.lastApiRequestTime
@@ -896,9 +889,9 @@ export class Cline {
 			rateLimitDelay = Math.ceil(Math.max(0, rateLimit * 1000 - timeSinceLastRequest) / 1000)
 		}
 
-		// Only show rate limiting message if we're not retrying. If retrying, we'll include the delay there.
+		// 仅在不重试时显示速率限制消息。如果重试,我们会在那里包含延迟。
 		if (rateLimitDelay > 0 && retryAttempt === 0) {
-			// Show countdown timer
+			// 显示倒计时计时器
 			for (let i = rateLimitDelay; i > 0; i--) {
 				const delayMessage = `Rate limiting for ${i} seconds...`
 				await this.say("api_req_retry_delayed", delayMessage, undefined, true)
@@ -906,7 +899,7 @@ export class Cline {
 			}
 		}
 
-		// Update last request time before making the request
+		// 在发出请求之前更新最后请求时间
 		this.lastApiRequestTime = Date.now()
 
 		if (mcpEnabled ?? true) {
@@ -914,7 +907,7 @@ export class Cline {
 			if (!mcpHub) {
 				throw new Error("MCP hub not available")
 			}
-			// Wait for MCP servers to be connected before generating system prompt
+			// 在生成系统提示之前等待 MCP 服务器连接
 			await pWaitFor(() => mcpHub!.isConnecting !== true, { timeout: 10_000 }).catch(() => {
 				console.error("MCP servers failed to connect in time")
 			})
@@ -952,7 +945,7 @@ export class Cline {
 			)
 		})()
 
-		// If the previous API request's total token usage is close to the context window, truncate the conversation history to free up space for the new request
+		// 如果前一个 API 请求的总令牌使用量接近上下文窗口,截断对话历史以为新请求腾出空间
 		if (previousApiReqIndex >= 0) {
 			const previousRequest = this.clineMessages[previousApiReqIndex]?.text
 			if (!previousRequest) return
@@ -976,19 +969,19 @@ export class Cline {
 			}
 		}
 
-		// Clean conversation history by:
-		// 1. Converting to Anthropic.MessageParam by spreading only the API-required properties
-		// 2. Converting image blocks to text descriptions if model doesn't support images
+		// 通过以下方式清理对话历史:
+		// 1. 通过仅传播 API 所需的属性将其转换为 Anthropic.MessageParam
+		// 2. 如果模型不支持图像,则将图像块转换为文本描述
 		const cleanConversationHistory = this.apiConversationHistory.map(({ role, content }) => {
-			// Handle array content (could contain image blocks)
+			// 处理数组内容(可能包含图像块)
 			if (Array.isArray(content)) {
 				if (!this.api.getModel().info.supportsImages) {
-					// Convert image blocks to text descriptions
+					// 将图像块转换为文本描述
 					content = content.map((block) => {
 						if (block.type === "image") {
-							// Convert image blocks to text descriptions
-							// Note: We can't access the actual image content/url due to API limitations,
-							// but we can indicate that an image was present in the conversation
+							// 将图像块转换为文本描述
+							// 注意:由于 API 限制,我们无法访问实际的图像内容/url,
+							// 但我们可以指示对话中存在图像
 							return {
 								type: "text",
 								text: "[Referenced image in conversation]",
@@ -1004,21 +997,21 @@ export class Cline {
 		const iterator = stream[Symbol.asyncIterator]()
 
 		try {
-			// awaiting first chunk to see if it will throw an error
+			// 等待第一个块以查看是否会抛出错误
 			this.isWaitingForFirstChunk = true
 			const firstChunk = await iterator.next()
 			yield firstChunk.value
 			this.isWaitingForFirstChunk = false
 		} catch (error) {
-			// note that this api_req_failed ask is unique in that we only present this option if the api hasn't streamed any content yet (ie it fails on the first chunk due), as it would allow them to hit a retry button. However if the api failed mid-stream, it could be in any arbitrary state where some tools may have executed, so that error is handled differently and requires cancelling the task entirely.
+			// 注意,这个 api_req_failed ask 是独特的,因为我们只在 api 尚未流式传输任何内容时才呈现此选项(即由于第一个块失败),因为它允许他们点击重试按钮。但是,如果 api 在流式传输过程中失败,它可能处于任何任意状态,其中一些工具可能已经执行,因此该错误的处理方式不同,需要完全取消任务。
 			if (alwaysApproveResubmit) {
 				const errorMsg = error.message ?? "Unknown error"
 				const baseDelay = requestDelaySeconds || 5
 				const exponentialDelay = Math.ceil(baseDelay * Math.pow(2, retryAttempt))
-				// Wait for the greater of the exponential delay or the rate limit delay
+				// 等待指数延迟或速率限制延迟中的较大值
 				const finalDelay = Math.max(exponentialDelay, rateLimitDelay)
 
-				// Show countdown timer with exponential backoff
+				// 显示带有指数退避的倒计时计时器
 				for (let i = finalDelay; i > 0; i--) {
 					await this.say(
 						"api_req_retry_delayed",
@@ -1036,7 +1029,7 @@ export class Cline {
 					false,
 				)
 
-				// delegate generator output from the recursive call with incremented retry count
+				// 委托来自递归调用的生成器输出,重试计数增加
 				yield* this.attemptApiRequest(previousApiReqIndex, retryAttempt + 1)
 				return
 			} else {
@@ -1045,19 +1038,19 @@ export class Cline {
 					error.message ?? JSON.stringify(serializeError(error), null, 2),
 				)
 				if (response !== "yesButtonClicked") {
-					// this will never happen since if noButtonClicked, we will clear current task, aborting this instance
+					// 这永远不会发生,因为如果 noButtonClicked,我们将清除当前任务,中止此实例
 					throw new Error("API request failed")
 				}
 				await this.say("api_req_retried")
-				// delegate generator output from the recursive call
+				// 委托来自递归调用的生成器输出
 				yield* this.attemptApiRequest(previousApiReqIndex)
 				return
 			}
 		}
 
-		// no error, so we can continue to yield all remaining chunks
-		// (needs to be placed outside of try/catch since it we want caller to handle errors not with api_req_failed as that is reserved for first chunk failures only)
-		// this delegates to another generator or iterable object. In this case, it's saying "yield all remaining values from this iterator". This effectively passes along all subsequent chunks from the original stream.
+		// 没有错误,所以我们可以继续产生所有剩余的块
+		// (需要放在 try/catch 之外,因为我们希望调用者处理错误而不是使用 api_req_failed,因为它仅保留用于第一个块失败)
+		// 这委托给另一个生成器或可迭代对象。在这种情况下,它说"从这个迭代器产生所有剩余的值"。这有效地传递了原始流中的所有后续块。
 		yield* iterator
 	}
 
@@ -1074,7 +1067,7 @@ export class Cline {
 		this.presentAssistantMessageHasPendingUpdates = false
 
 		if (this.currentStreamingContentIndex >= this.assistantMessageContent.length) {
-			// this may happen if the last content block was completed before streaming could finish. if streaming is finished, and we're out of bounds then this means we already presented/executed the last content block and are ready to continue to next request
+			// 如果最后一个内容块在流式传输完成之前完成,这种情况可能会发生。如果流式传输已完成,并且我们超出范围,那么这意味着我们已经呈现/执行了最后一个内容块,并准备继续下一个请求
 			if (this.didCompleteReadingStream) {
 				this.userMessageContentReady = true
 			}
@@ -1084,7 +1077,7 @@ export class Cline {
 			//throw new Error("No more content blocks to stream! This shouldn't happen...") // remove and just return after testing
 		}
 
-		const block = cloneDeep(this.assistantMessageContent[this.currentStreamingContentIndex]) // need to create copy bc while stream is updating the array, it could be updating the reference block properties too
+		const block = cloneDeep(this.assistantMessageContent[this.currentStreamingContentIndex]) // 需要创建副本,因为在流更新数组时,它可能也在更新引用块属性
 
 		let isCheckpointPossible = false
 
@@ -1095,36 +1088,36 @@ export class Cline {
 				}
 				let content = block.content
 				if (content) {
-					// (have to do this for partial and complete since sending content in thinking tags to markdown renderer will automatically be removed)
-					// Remove end substrings of <thinking or </thinking (below xml parsing is only for opening tags)
-					// (this is done with the xml parsing below now, but keeping here for reference)
+					// (对部分和完整都必须这样做,因为将内容发送到思考标签中的 markdown 渲染器会自动删除)
+					// 删除 <thinking 或 </thinking 的结尾子字符串(下面的 xml 解析仅用于开始标签)
+					// (这现在通过下面的 xml 解析完成,但保留在这里供参考)
 					// content = content.replace(/<\/?t(?:h(?:i(?:n(?:k(?:i(?:n(?:g)?)?)?$/, "")
-					// Remove all instances of <thinking> (with optional line break after) and </thinking> (with optional line break before)
-					// - Needs to be separate since we dont want to remove the line break before the first tag
-					// - Needs to happen before the xml parsing below
+					// 删除所有 <thinking> (后面可选换行符)和 </thinking> (前面可选换行符)的实例
+					// - 需要分开,因为我们不想删除第一个标签之前的换行符
+					// - 需要在下面的 xml 解析之前发生
 					content = content.replace(/<thinking>\s?/g, "")
 					content = content.replace(/\s?<\/thinking>/g, "")
 
-					// Remove partial XML tag at the very end of the content (for tool use and thinking tags)
-					// (prevents scrollview from jumping when tags are automatically removed)
+					// 删除内容最后的部分 XML 标签(用于工具使用和思考标签)
+					// (防止滚动视图在标签自动删除时跳转)
 					const lastOpenBracketIndex = content.lastIndexOf("<")
 					if (lastOpenBracketIndex !== -1) {
 						const possibleTag = content.slice(lastOpenBracketIndex)
-						// Check if there's a '>' after the last '<' (i.e., if the tag is complete) (complete thinking and tool tags will have been removed by now)
+						// 检查最后一个 '<' 后是否有 '>' (即标签是否完整)(完整的思考和工具标签现在已被删除)
 						const hasCloseBracket = possibleTag.includes(">")
 						if (!hasCloseBracket) {
-							// Extract the potential tag name
+							// 提取潜在的标签名称
 							let tagContent: string
 							if (possibleTag.startsWith("</")) {
 								tagContent = possibleTag.slice(2).trim()
 							} else {
 								tagContent = possibleTag.slice(1).trim()
 							}
-							// Check if tagContent is likely an incomplete tag name (letters and underscores only)
+							// 检查 tagContent 是否可能是不完整的标签名称(仅字母和下划线)
 							const isLikelyTagName = /^[a-zA-Z_]+$/.test(tagContent)
-							// Preemptively remove < or </ to keep from these artifacts showing up in chat (also handles closing thinking tags)
+							// 预先删除 < 或 </ 以防止这些工件显示在聊天中(也处理关闭思考标签)
 							const isOpeningOrClosing = possibleTag === "<" || possibleTag === "</"
-							// If the tag is incomplete and at the end, remove it from the content
+							// 如果标签不完整且在末尾,从内容中删除它
 							if (isOpeningOrClosing || isLikelyTagName) {
 								content = content.slice(0, lastOpenBracketIndex).trim()
 							}
@@ -1179,14 +1172,14 @@ export class Cline {
 				}
 
 				if (this.didRejectTool) {
-					// ignore any tool content after user has rejected tool once
+					// 用户拒绝工具后忽略任何工具内容
 					if (!block.partial) {
 						this.userMessageContent.push({
 							type: "text",
 							text: `Skipping tool ${toolDescription()} due to user rejecting a previous tool.`,
 						})
 					} else {
-						// partial tool after user rejected a previous tool
+						// 用户拒绝之前的工具后的部分工具
 						this.userMessageContent.push({
 							type: "text",
 							text: `Tool ${toolDescription()} was interrupted and not executed due to user rejecting a previous tool.`,
@@ -1196,7 +1189,7 @@ export class Cline {
 				}
 
 				if (this.didAlreadyUseTool) {
-					// ignore any content after a tool has already been used
+					// 工具已使用后忽略任何内容
 					this.userMessageContent.push({
 						type: "text",
 						text: `Tool [${block.name}] was not executed because a tool has already been used in this message. Only one tool may be used per message. You must assess the first tool's result before proceeding to use the next tool.`,
@@ -1217,18 +1210,17 @@ export class Cline {
 					} else {
 						this.userMessageContent.push(...content)
 					}
-					// once a tool result has been collected, ignore all other tool uses since we should only ever present one tool result per message
+					// 一旦收集了工具结果,忽略所有其他工具使用,因为我们每条消息应该只呈现一个工具结果
 					this.didAlreadyUseTool = true
 
-					// Flag a checkpoint as possible since we've used a tool
-					// which may have changed the file system.
+					// 标记检查点为可能,因为我们已经使用了一个可能改变文件系统的工具
 					isCheckpointPossible = true
 				}
 
 				const askApproval = async (type: ClineAsk, partialMessage?: string) => {
 					const { response, text, images } = await this.ask(type, partialMessage, false)
 					if (response !== "yesButtonClicked") {
-						// Handle both messageResponse and noButtonClicked with text
+						// 处理带有文本的 messageResponse 和 noButtonClicked
 						if (text) {
 							await this.say("user_feedback", text, images)
 							pushToolResult(
@@ -1240,7 +1232,7 @@ export class Cline {
 						this.didRejectTool = true
 						return false
 					}
-					// Handle yesButtonClicked with text
+					// 处理带有文本的 yesButtonClicked
 					if (text) {
 						await this.say("user_feedback", text, images)
 						pushToolResult(formatResponse.toolResult(formatResponse.toolApprovedWithFeedback(text), images))
@@ -1262,7 +1254,7 @@ export class Cline {
 					pushToolResult(formatResponse.toolError(errorString))
 				}
 
-				// If block is partial, remove partial closing tag so its not presented to user
+				// 如果块是部分的,删除部分关闭标签,以便不向用户呈现
 				const removeClosingTag = (tag: ToolParamName, text?: string) => {
 					if (!block.partial) {
 						return text || ""
@@ -1270,9 +1262,9 @@ export class Cline {
 					if (!text) {
 						return ""
 					}
-					// This regex dynamically constructs a pattern to match the closing tag:
-					// - Optionally matches whitespace before the tag
-					// - Matches '<' or '</' optionally followed by any subset of characters from the tag name
+					// 这个正则表达式动态构建一个模式来匹配关闭标签:
+					// - 可选地匹配标签前的空白
+					// - 匹配 '<' 或 '</' 后面可选地跟随标签名称的任何子集字符
 					const tagRegex = new RegExp(
 						`\\s?<\/?${tag
 							.split("")
@@ -1287,7 +1279,7 @@ export class Cline {
 					await this.browserSession.closeBrowser()
 				}
 
-				// Validate tool use before execution
+				// 在执行之前验证工具使用
 				const { mode, customModes } = (await this.providerRef.deref()?.getState()) ?? {}
 				try {
 					validateToolUse(
@@ -1311,11 +1303,11 @@ export class Cline {
 						let newContent: string | undefined = block.params.content
 						let predictedLineCount: number | undefined = parseInt(block.params.line_count ?? "0")
 						if (!relPath || !newContent) {
-							// checking for newContent ensure relPath is complete
-							// wait so we can determine if it's a new file or editing an existing file
+							// 检查 newContent 确保 relPath 完整
+							// 等待以确定是新文件还是编辑现有文件
 							break
 						}
-						// Check if file exists using cached map or fs.access
+						// 使用缓存映射或 fs.access 检查文件是否存在
 						let fileExists: boolean
 						if (this.diffViewProvider.editType !== undefined) {
 							fileExists = this.diffViewProvider.editType === "modify"
@@ -1325,9 +1317,9 @@ export class Cline {
 							this.diffViewProvider.editType = fileExists ? "modify" : "create"
 						}
 
-						// pre-processing newContent for cases where weaker models might add artifacts like markdown codeblock markers (deepseek/llama) or extra escape characters (gemini)
+						// 预处理 newContent,处理较弱模型可能添加的工件,如 markdown 代码块标记(deepseek/llama)或额外的转义字符(gemini)
 						if (newContent.startsWith("```")) {
-							// this handles cases where it includes language specifiers like ```python ```js
+							// 这处理包含语言说明符的情况,如 ```python ```js
 							newContent = newContent.split("\n").slice(1).join("\n").trim()
 						}
 						if (newContent.endsWith("```")) {
@@ -1335,7 +1327,7 @@ export class Cline {
 						}
 
 						if (!this.api.getModel().id.includes("claude")) {
-							// it seems not just llama models are doing this, but also gemini and potentially others
+							// 似乎不仅仅是 llama 模型在这样做,gemini 和可能其他模型也是如此
 							if (
 								newContent.includes("&gt;") ||
 								newContent.includes("&lt;") ||
@@ -1354,15 +1346,15 @@ export class Cline {
 						}
 						try {
 							if (block.partial) {
-								// update gui message
+								// 更新 gui 消息
 								const partialMessage = JSON.stringify(sharedMessageProps)
 								await this.ask("tool", partialMessage, block.partial).catch(() => {})
-								// update editor
+								// 更新编辑器
 								if (!this.diffViewProvider.isEditing) {
-									// open the editor and prepare to stream content in
+									// 打开编辑器并准备流式传输内容
 									await this.diffViewProvider.open(relPath)
 								}
-								// editor is open, stream content in
+								// 编辑器已打开,流式传输内容
 								await this.diffViewProvider.update(
 									everyLineHasLineNumbers(newContent) ? stripLineNumbers(newContent) : newContent,
 									false,
@@ -1391,23 +1383,23 @@ export class Cline {
 								}
 								this.consecutiveMistakeCount = 0
 
-								// if isEditingFile false, that means we have the full contents of the file already.
-								// it's important to note how this function works, you can't make the assumption that the block.partial conditional will always be called since it may immediately get complete, non-partial data. So this part of the logic will always be called.
-								// in other words, you must always repeat the block.partial logic here
+								// 如果 isEditingFile 为 false,这意味着我们已经有了文件的完整内容。
+								// 重要的是要注意这个函数是如何工作的,你不能假设 block.partial 条件总是会被调用,因为它可能立即获得完整的、非部分的数据。所以这部分逻辑总是会被调用。
+								// 换句话说,你必须始终在这里重复 block.partial 逻辑
 								if (!this.diffViewProvider.isEditing) {
-									// show gui message before showing edit animation
+									// 在显示编辑动画之前显示 gui 消息
 									const partialMessage = JSON.stringify(sharedMessageProps)
-									await this.ask("tool", partialMessage, true).catch(() => {}) // sending true for partial even though it's not a partial, this shows the edit row before the content is streamed into the editor
+									await this.ask("tool", partialMessage, true).catch(() => {}) // 即使不是部分的也发送 true,这在内容流式传输到编辑器之前显示编辑行
 									await this.diffViewProvider.open(relPath)
 								}
 								await this.diffViewProvider.update(
 									everyLineHasLineNumbers(newContent) ? stripLineNumbers(newContent) : newContent,
 									true,
 								)
-								await delay(300) // wait for diff view to update
+								await delay(300) // 等待差异视图更新
 								this.diffViewProvider.scrollToFirstDiff()
 
-								// Check for code omissions before proceeding
+								// 在继续之前检查代码省略
 								if (
 									detectCodeOmission(
 										this.diffViewProvider.originalContent || "",
@@ -1461,7 +1453,7 @@ export class Cline {
 								}
 								const { newProblemsMessage, userEdits, finalContent } =
 									await this.diffViewProvider.saveChanges()
-								this.didEditFile = true // used to determine if we should wait for busy terminal to update before sending api request
+								this.didEditFile = true // 用于确定在发送 api 请求之前是否应该等待繁忙终端更新
 								if (userEdits) {
 									await this.say(
 										"user_feedback_diff",
@@ -1508,7 +1500,7 @@ export class Cline {
 
 						try {
 							if (block.partial) {
-								// update gui message
+								// 更新 gui 消息
 								const partialMessage = JSON.stringify(sharedMessageProps)
 								await this.ask("tool", partialMessage, block.partial).catch(() => {})
 								break
@@ -1537,7 +1529,7 @@ export class Cline {
 
 								const originalContent = await fs.readFile(absolutePath, "utf-8")
 
-								// Apply the diff to the original content
+								// 将 diff 应用到原始内容
 								const diffResult = (await this.diffStrategy?.applyDiff(
 									originalContent,
 									diffContent,
@@ -1567,7 +1559,7 @@ export class Cline {
 
 								this.consecutiveMistakeCount = 0
 								this.consecutiveMistakeCountForApplyDiff.delete(relPath)
-								// Show diff view before asking for approval
+								// 在请求批准前显示 diff 视图
 								this.diffViewProvider.editType = "modify"
 								await this.diffViewProvider.open(relPath)
 								await this.diffViewProvider.update(diffResult.content, true)
@@ -1580,13 +1572,13 @@ export class Cline {
 
 								const didApprove = await askApproval("tool", completeMessage)
 								if (!didApprove) {
-									await this.diffViewProvider.revertChanges() // This likely handles closing the diff view
+									await this.diffViewProvider.revertChanges() // 这可能会处理关闭 diff 视图
 									break
 								}
 
 								const { newProblemsMessage, userEdits, finalContent } =
 									await this.diffViewProvider.saveChanges()
-								this.didEditFile = true // used to determine if we should wait for busy terminal to update before sending api request
+								this.didEditFile = true // 用于确定在发送 api 请求前是否需要等待繁忙的终端更新
 								if (userEdits) {
 									await this.say(
 										"user_feedback_diff",
@@ -1639,7 +1631,7 @@ export class Cline {
 								break
 							}
 
-							// Validate required parameters
+							// 验证必需的参数
 							if (!relPath) {
 								this.consecutiveMistakeCount++
 								pushToolResult(await this.sayAndCreateMissingParamError("insert_content", "path"))
@@ -1682,7 +1674,7 @@ export class Cline {
 
 							this.consecutiveMistakeCount = 0
 
-							// Read the file
+							// 读取文件
 							const fileContent = await fs.readFile(absolutePath, "utf8")
 							this.diffViewProvider.editType = "modify"
 							this.diffViewProvider.originalContent = fileContent
@@ -1698,10 +1690,10 @@ export class Cline {
 								}),
 							).join("\n")
 
-							// Show changes in diff view
+							// 在 diff 视图中显示更改
 							if (!this.diffViewProvider.isEditing) {
 								await this.ask("tool", JSON.stringify(sharedMessageProps), true).catch(() => {})
-								// First open with original content
+								// 首先打开原始内容
 								await this.diffViewProvider.open(relPath)
 								await this.diffViewProvider.update(fileContent, false)
 								this.diffViewProvider.scrollToFirstDiff()
@@ -1836,7 +1828,7 @@ export class Cline {
 									break
 								}
 
-								// Read the original file content
+								// 读取原始文件内容
 								const fileContent = await fs.readFile(absolutePath, "utf-8")
 								this.diffViewProvider.editType = "modify"
 								this.diffViewProvider.originalContent = fileContent
@@ -1854,19 +1846,19 @@ export class Cline {
 										const startLine = Math.max((op.start_line ?? 1) - 1, 0)
 										const endLine = Math.min((op.end_line ?? lines.length) - 1, lines.length - 1)
 
-										// Get the content before and after the target section
+										// 获取目标部分前后的内容
 										const beforeLines = lines.slice(0, startLine)
 										const afterLines = lines.slice(endLine + 1)
 
-										// Get the target section and perform replacement
+										// 获取目标部分并执行替换
 										const targetContent = lines.slice(startLine, endLine + 1).join("\n")
 										const modifiedContent = targetContent.replace(searchPattern, op.replace)
 										const modifiedLines = modifiedContent.split("\n")
 
-										// Reconstruct the full content with the modified section
+										// 重建包含修改部分的完整内容
 										lines = [...beforeLines, ...modifiedLines, ...afterLines]
 									} else {
-										// Global replacement
+										// 全局替换
 										const fullContent = lines.join("\n")
 										const modifiedContent = fullContent.replace(searchPattern, op.replace)
 										lines = modifiedContent.split("\n")
@@ -1877,7 +1869,7 @@ export class Cline {
 
 								this.consecutiveMistakeCount = 0
 
-								// Show diff preview
+								// 显示 diff 预览
 								const diff = formatResponse.createPrettyPatch(relPath, fileContent, newContent)
 
 								if (!diff) {
@@ -1896,13 +1888,13 @@ export class Cline {
 
 								const didApprove = await askApproval("tool", completeMessage)
 								if (!didApprove) {
-									await this.diffViewProvider.revertChanges() // This likely handles closing the diff view
+									await this.diffViewProvider.revertChanges() // 这可能会处理关闭 diff 视图
 									break
 								}
 
 								const { newProblemsMessage, userEdits, finalContent } =
 									await this.diffViewProvider.saveChanges()
-								this.didEditFile = true // used to determine if we should wait for busy terminal to update before sending api request
+								this.didEditFile = true // 用于确定在发送 api 请求前是否需要等待繁忙的终端更新
 								if (userEdits) {
 									await this.say(
 										"user_feedback_diff",
@@ -1967,7 +1959,7 @@ export class Cline {
 								if (!didApprove) {
 									break
 								}
-								// now execute the tool like normal
+								// 现在像正常一样执行工具
 								const content = await extractTextFromFile(absolutePath)
 								pushToolResult(content)
 								break
@@ -2114,9 +2106,9 @@ export class Cline {
 						const coordinate: string | undefined = block.params.coordinate
 						const text: string | undefined = block.params.text
 						if (!action || !browserActions.includes(action)) {
-							// checking for action to ensure it is complete and valid
+							// 检查 action 以确保它是完整且有效的
 							if (!block.partial) {
-								// if the block is complete and we don't have a valid action this is a mistake
+								// 如果块是完整的且我们没有有效的 action，这是一个错误
 								this.consecutiveMistakeCount++
 								pushToolResult(await this.sayAndCreateMissingParamError("browser_action", "action"))
 								await this.browserSession.closeBrowser()
@@ -2162,9 +2154,9 @@ export class Cline {
 										break
 									}
 
-									// NOTE: it's okay that we call this message since the partial inspect_site is finished streaming. The only scenario we have to avoid is sending messages WHILE a partial message exists at the end of the messages array. For example the api_req_finished message would interfere with the partial message, so we needed to remove that.
-									// await this.say("inspect_site_result", "") // no result, starts the loading spinner waiting for result
-									await this.say("browser_action_result", "") // starts loading spinner
+									// 注意：调用此消息是可以的，因为部分 inspect_site 已经完成流式传输。我们必须避免的唯一场景是在消息数组末尾存在部分消息时发送消息。例如，api_req_finished 消息会干扰部分消息，所以我们需要删除它。
+									// await this.say("inspect_site_result", "") // 无结果，开始等待结果的加载旋转器
+									await this.say("browser_action_result", "") // 开始加载旋转器
 
 									await this.browserSession.launchBrowser()
 									browserActionResult = await this.browserSession.navigateToUrl(url)
@@ -2179,7 +2171,7 @@ export class Cline {
 												),
 											)
 											await this.browserSession.closeBrowser()
-											break // can't be within an inner switch
+											break // 不能在内部 switch 中
 										}
 									}
 									if (action === "type") {
@@ -2249,7 +2241,7 @@ export class Cline {
 								break
 							}
 						} catch (error) {
-							await this.browserSession.closeBrowser() // if any error occurs, the browser session is terminated
+							await this.browserSession.closeBrowser() // 如果发生任何错误，浏览器会话将被终止
 							await handleError("executing browser action", error)
 							break
 						}
@@ -2317,7 +2309,7 @@ export class Cline {
 									)
 									break
 								}
-								// arguments are optional, but if they are provided they must be valid JSON
+								// 参数是可选的，但如果提供了参数必须是有效的 JSON
 								// if (!mcp_arguments) {
 								// 	this.consecutiveMistakeCount++
 								// 	pushToolResult(await this.sayAndCreateMissingParamError("use_mcp_tool", "arguments"))
@@ -2352,14 +2344,14 @@ export class Cline {
 								if (!didApprove) {
 									break
 								}
-								// now execute the tool
-								await this.say("mcp_server_request_started") // same as browser_action_result
+								// 现在执行工具
+								await this.say("mcp_server_request_started") // 与 browser_action_result 相同
 								const toolResult = await this.providerRef
 									.deref()
 									?.getMcpHub()
 									?.callTool(server_name, tool_name, parsedArguments)
 
-								// TODO: add progress indicator and ability to parse images and non-text responses
+								// TODO: 添加进度指示器和解析图像和非文本响应的功能
 								const toolResultPretty =
 									(toolResult?.isError ? "Error:\n" : "") +
 										toolResult?.content
@@ -2421,7 +2413,7 @@ export class Cline {
 								if (!didApprove) {
 									break
 								}
-								// now execute the tool
+								// 现在执行工具
 								await this.say("mcp_server_request_started")
 								const resourceResult = await this.providerRef
 									.deref()
@@ -2493,7 +2485,7 @@ export class Cline {
 								}
 								this.consecutiveMistakeCount = 0
 
-								// Verify the mode exists
+								// 验证模式是否存在
 								const targetMode = getModeBySlug(
 									mode_slug,
 									(await this.providerRef.deref()?.getState())?.customModes,
@@ -2503,7 +2495,7 @@ export class Cline {
 									break
 								}
 
-								// Check if already in requested mode
+								// 检查是否已经在请求的模式中
 								const currentMode =
 									(await this.providerRef.deref()?.getState())?.mode ?? defaultModeSlug
 								if (currentMode === mode_slug) {
@@ -2522,7 +2514,7 @@ export class Cline {
 									break
 								}
 
-								// Switch the mode using shared handler
+								// 使用共享处理程序切换模式
 								const provider = this.providerRef.deref()
 								if (provider) {
 									await provider.handleModeSwitch(mode_slug)
@@ -2532,7 +2524,7 @@ export class Cline {
 										targetMode.name
 									} mode${reason ? ` because: ${reason}` : ""}.`,
 								)
-								await delay(500) // delay to allow mode change to take effect before next tool is executed
+								await delay(500) // 延迟以允许模式更改在执行下一个工具之前生效
 								break
 							}
 						} catch (error) {
@@ -2566,7 +2558,7 @@ export class Cline {
 								}
 								this.consecutiveMistakeCount = 0
 
-								// Verify the mode exists
+								// 验证模式是否存在
 								const targetMode = getModeBySlug(
 									mode,
 									(await this.providerRef.deref()?.getState())?.customModes,
@@ -2576,7 +2568,7 @@ export class Cline {
 									break
 								}
 
-								// Show what we're about to do
+								// 显示我们将要做什么
 								const toolMessage = JSON.stringify({
 									tool: "newTask",
 									mode: targetMode.name,
@@ -2588,7 +2580,7 @@ export class Cline {
 									break
 								}
 
-								// Switch mode first, then create new task instance
+								// 先切换模式，然后创建新的任务实例
 								const provider = this.providerRef.deref()
 								if (provider) {
 									await provider.handleModeSwitch(mode)
@@ -2615,17 +2607,17 @@ export class Cline {
 						let resultToSend = result
 						if (command) {
 							await this.say("completion_result", resultToSend)
-							// TODO: currently we don't handle if this command fails, it could be useful to let cline know and retry
+							// TODO: 目前我们不处理这个命令失败的情况，让 cline 知道并重试可能会有用
 							const [didUserReject, commandResult] = await this.executeCommand(command, true)
-							// if we received non-empty string, the command was rejected or failed
+							// 如果我们收到非空字符串，则命令被拒绝或失败
 							if (commandResult) {
 								return [didUserReject, commandResult]
 							}
 							resultToSend = ""
 						}
-						const { response, text, images } = await this.ask("completion_result", resultToSend) // this prompts webview to show 'new task' button, and enable text input (which would be the 'text' here)
+						const { response, text, images } = await this.ask("completion_result", resultToSend) // 这会提示 webview 显示"新任务"按钮，并启用文本输入（这将是这里的"text"）
 						if (response === "yesButtonClicked") {
-							return [false, ""] // signals to recursive loop to stop (for now this never happens since yesButtonClicked will trigger a new task)
+							return [false, ""] // 向递归循环发出停止信号（目前这种情况永远不会发生，因为 yesButtonClicked 会触发新任务）
 						}
 						await this.say("user_feedback", text ?? "", images)
 						return [
@@ -2636,20 +2628,20 @@ export class Cline {
 							const lastMessage = this.clineMessages.at(-1)
 							if (block.partial) {
 								if (command) {
-									// the attempt_completion text is done, now we're getting command
-									// remove the previous partial attempt_completion ask, replace with say, post state to webview, then stream command
+									// attempt_completion 文本已完成，现在我们正在获取命令
+									// 删除之前的部分 attempt_completion 询问，替换为 say，将状态发布到 webview，然后流式传输命令
 
 									// const secondLastMessage = this.clineMessages.at(-2)
 									if (lastMessage && lastMessage.ask === "command") {
-										// update command
+										// 更新命令
 										await this.ask(
 											"command",
 											removeClosingTag("command", command),
 											block.partial,
 										).catch(() => {})
 									} else {
-										// last message is completion_result
-										// we have command string, which means we have the result as well, so finish it (doesnt have to exist yet)
+										// 最后一条消息是 completion_result
+										// 我们有命令字符串，这意味着我们也有结果，所以完成它（不一定要存在）
 										await this.say(
 											"completion_result",
 											removeClosingTag("result", result),
@@ -2663,7 +2655,7 @@ export class Cline {
 										).catch(() => {})
 									}
 								} else {
-									// no command, still outputting partial result
+									// 没有命令，仍在输出部分结果
 									await this.say(
 										"completion_result",
 										removeClosingTag("result", result),
@@ -2685,11 +2677,11 @@ export class Cline {
 								let commandResult: ToolResponse | undefined
 								if (command) {
 									if (lastMessage && lastMessage.ask !== "command") {
-										// havent sent a command message yet so first send completion_result then command
+										// 还没有发送命令消息，所以先发送 completion_result 然后是命令
 										await this.say("completion_result", result, undefined, false)
 									}
 
-									// complete command message
+									// 完成命令消息
 									const didApprove = await askApproval("command", command)
 									if (!didApprove) {
 										break
@@ -2700,16 +2692,16 @@ export class Cline {
 										pushToolResult(execCommandResult)
 										break
 									}
-									// user didn't reject, but the command may have output
+									// 用户没有拒绝，但命令可能有输出
 									commandResult = execCommandResult
 								} else {
 									await this.say("completion_result", result, undefined, false)
 								}
 
-								// we already sent completion_result says, an empty string asks relinquishes control over button and field
+								// 我们已经发送了 completion_result says，一个空字符串询问放弃对按钮和字段的控制
 								const { response, text, images } = await this.ask("completion_result", "", false)
 								if (response === "yesButtonClicked") {
-									pushToolResult("") // signals to recursive loop to stop (for now this never happens since yesButtonClicked will trigger a new task)
+									pushToolResult("") // 向递归循环发出停止信号（目前这种情况永远不会发生，因为 yesButtonClicked 会触发新任务）
 									break
 								}
 								await this.say("user_feedback", text ?? "", images)
@@ -2749,31 +2741,31 @@ export class Cline {
 		}
 
 		/*
-		Seeing out of bounds is fine, it means that the next too call is being built up and ready to add to assistantMessageContent to present.
-		When you see the UI inactive during this, it means that a tool is breaking without presenting any UI. For example the write_to_file tool was breaking when relpath was undefined, and for invalid relpath it never presented UI.
+		看到超出范围是可以的，这意味着下一个工具调用正在构建并准备添加到 assistantMessageContent 中以呈现。
+		当你在此期间看到 UI 不活动时，这意味着工具在没有呈现任何 UI 的情况下中断。例如，当 relpath 未定义时，write_to_file 工具会中断，对于无效的 relpath，它从不呈现 UI。
 		*/
-		this.presentAssistantMessageLocked = false // this needs to be placed here, if not then calling this.presentAssistantMessage below would fail (sometimes) since it's locked
-		// NOTE: when tool is rejected, iterator stream is interrupted and it waits for userMessageContentReady to be true. Future calls to present will skip execution since didRejectTool and iterate until contentIndex is set to message length and it sets userMessageContentReady to true itself (instead of preemptively doing it in iterator)
+		this.presentAssistantMessageLocked = false // 这需要放在这里，如果不放在这里，那么下面调用 this.presentAssistantMessage 会失败（有时），因为它被锁定了
+		// 注意：当工具被拒绝时，迭代器流被中断，它等待 userMessageContentReady 为 true。未来对 present 的调用将跳过执行，因为 didRejectTool 和迭代直到 contentIndex 设置为消息长度，它自己设置 userMessageContentReady 为 true（而不是在迭代器中提前这样做）
 		if (!block.partial || this.didRejectTool || this.didAlreadyUseTool) {
-			// block is finished streaming and executing
+			// 块已完成流式传输和执行
 			if (this.currentStreamingContentIndex === this.assistantMessageContent.length - 1) {
-				// its okay that we increment if !didCompleteReadingStream, it'll just return bc out of bounds and as streaming continues it will call presentAssitantMessage if a new block is ready. if streaming is finished then we set userMessageContentReady to true when out of bounds. This gracefully allows the stream to continue on and all potential content blocks be presented.
-				// last block is complete and it is finished executing
-				this.userMessageContentReady = true // will allow pwaitfor to continue
+				// 如果 !didCompleteReadingStream，增加是可以的，它会因为超出范围而返回，并且当流继续时，如果有新块准备好，它会调用 presentAssitantMessage。如果流完成，那么当超出范围时，我们将 userMessageContentReady 设置为 true。这优雅地允许流继续并呈现所有潜在的内容块。
+				// 最后一个块完成，并且它已完成执行
+				this.userMessageContentReady = true // 将允许 pwaitfor 继续
 			}
 
-			// call next block if it exists (if not then read stream will call it when its ready)
-			this.currentStreamingContentIndex++ // need to increment regardless, so when read stream calls this function again it will be streaming the next block
+			// 如果存在，则调用下一个块（如果不存在，则读取流将在准备好时调用它）
+			this.currentStreamingContentIndex++ // 无论如何都需要增加，这样当读取流再次调用这个函数时，它将流式传输下一个块
 
 			if (this.currentStreamingContentIndex < this.assistantMessageContent.length) {
-				// there are already more content blocks to stream, so we'll call this function ourselves
+				// 已经有更多的内容块要流式传输，所以我们会自己调用这个函数
 				// await this.presentAssistantContent()
 
 				this.presentAssistantMessage()
 				return
 			}
 		}
-		// block is partial, but the read stream may have finished
+		// 块是部分的，但读取流可能已完成
 		if (this.presentAssistantMessageHasPendingUpdates) {
 			this.presentAssistantMessage()
 		}
@@ -2808,18 +2800,18 @@ export class Cline {
 			this.consecutiveMistakeCount = 0
 		}
 
-		// get previous api req's index to check token usage and determine if we need to truncate conversation history
+		// 获取前一个 api 请求的索引以检查令牌使用情况并确定是否需要截断对话历史记录
 		const previousApiReqIndex = findLastIndex(this.clineMessages, (m) => m.say === "api_req_started")
 
-		// Save checkpoint if this is the first API request.
+		// 如果这是第一个 API 请求，则保存检查点。
 		const isFirstRequest = this.clineMessages.filter((m) => m.say === "api_req_started").length === 0
 
 		if (isFirstRequest) {
 			await this.checkpointSave({ isFirst: true })
 		}
 
-		// getting verbose details is an expensive operation, it uses globby to top-down build file structure of project which for large projects can take a few seconds
-		// for the best UX we show a placeholder api_req_started message with a loading spinner as this happens
+		// 获取详细信息是一个昂贵的操作，它使用 globby 自上而下构建项目的文件结构，对于大型项目可能需要几秒钟
+		// 为了最佳的用户体验，我们在此发生时显示一个带有加载旋转器的占位符 api_req_started 消息
 		await this.say(
 			"api_req_started",
 			JSON.stringify({
@@ -2830,12 +2822,12 @@ export class Cline {
 
 		const [parsedUserContent, environmentDetails] = await this.loadContext(userContent, includeFileDetails)
 		userContent = parsedUserContent
-		// add environment details as its own text block, separate from tool results
+		// 将环境详细信息作为其自己的文本块添加，与工具结果分开
 		userContent.push({ type: "text", text: environmentDetails })
 
 		await this.addToApiConversationHistory({ role: "user", content: userContent })
 
-		// since we sent off a placeholder api_req_started message to update the webview while waiting to actually start the API request (to load potential details for example), we need to update the text of that message
+		// 由于我们发送了一个占位符 api_req_started 消息以在等待实际开始 API 请求时更新 webview（例如加载潜在的详细信息），我们需要更新该消息的文本
 		const lastApiReqIndex = findLastIndex(this.clineMessages, (m) => m.say === "api_req_started")
 		this.clineMessages[lastApiReqIndex].text = JSON.stringify({
 			request: userContent.map((block) => formatContentBlockToMarkdown(block)).join("\n\n"),
@@ -2850,9 +2842,9 @@ export class Cline {
 			let outputTokens = 0
 			let totalCost: number | undefined
 
-			// update api_req_started. we can't use api_req_finished anymore since it's a unique case where it could come after a streaming message (ie in the middle of being updated or executed)
-			// fortunately api_req_finished was always parsed out for the gui anyways, so it remains solely for legacy purposes to keep track of prices in tasks from history
-			// (it's worth removing a few months from now)
+			// 更新 api_req_started。我们不能再使用 api_req_finished，因为它是一个独特的情况，它可能在流式消息之后出现（即在更新或执行的中间）
+			// 幸运的是，api_req_finished 总是被解析出来用于 gui，所以它仅用于保留历史任务中的价格的遗留目的
+			// （几个月后值得删除）
 			const updateApiReqMsg = (cancelReason?: ClineApiReqCancelReason, streamingFailedMessage?: string) => {
 				this.clineMessages[lastApiReqIndex].text = JSON.stringify({
 					...JSON.parse(this.clineMessages[lastApiReqIndex].text || "{}"),
@@ -2876,20 +2868,20 @@ export class Cline {
 
 			const abortStream = async (cancelReason: ClineApiReqCancelReason, streamingFailedMessage?: string) => {
 				if (this.diffViewProvider.isEditing) {
-					await this.diffViewProvider.revertChanges() // closes diff view
+					await this.diffViewProvider.revertChanges() // 关闭差异视图
 				}
 
-				// if last message is a partial we need to update and save it
+				// 如果最后一条消息是部分的，我们需要更新并保存它
 				const lastMessage = this.clineMessages.at(-1)
 				if (lastMessage && lastMessage.partial) {
-					// lastMessage.ts = Date.now() DO NOT update ts since it is used as a key for virtuoso list
+					// lastMessage.ts = Date.now() 不要更新 ts，因为它用作 virtuoso 列表的键
 					lastMessage.partial = false
-					// instead of streaming partialMessage events, we do a save and post like normal to persist to disk
+					// 不是流式传输 partialMessage 事件，我们像正常一样执行保存和发布以持久化到磁盘
 					console.log("updating partial message", lastMessage)
 					// await this.saveClineMessages()
 				}
 
-				// Let assistant know their response was interrupted for when task is resumed
+				// 让助手知道他们的响应被中断，以便在任务恢复时使用
 				await this.addToApiConversationHistory({
 					role: "assistant",
 					content: [
@@ -2906,15 +2898,15 @@ export class Cline {
 					],
 				})
 
-				// update api_req_started to have cancelled and cost, so that we can display the cost of the partial stream
+				// 更新 api_req_started 以包含取消和成本，以便我们可以显示部分流的成本
 				updateApiReqMsg(cancelReason, streamingFailedMessage)
 				await this.saveClineMessages()
 
-				// signals to provider that it can retrieve the saved messages from disk, as abortTask can not be awaited on in nature
+				// 向提供者发出信号，表明它可以从磁盘检索保存的消息，因为 abortTask 本质上不能被等待
 				this.didFinishAbortingStream = true
 			}
 
-			// reset streaming state
+			// 重置流式传输状态
 			this.currentStreamingContentIndex = 0
 			this.assistantMessageContent = []
 			this.didCompleteReadingStream = false
@@ -2926,14 +2918,14 @@ export class Cline {
 			this.presentAssistantMessageHasPendingUpdates = false
 			await this.diffViewProvider.reset()
 
-			const stream = this.attemptApiRequest(previousApiReqIndex) // yields only if the first chunk is successful, otherwise will allow the user to retry the request (most likely due to rate limit error, which gets thrown on the first chunk)
+			const stream = this.attemptApiRequest(previousApiReqIndex) // 仅在第一个块成功时产生，否则将允许用户重试请求（最可能是由于速率限制错误，这在第一个块上抛出）
 			let assistantMessage = ""
 			let reasoningMessage = ""
 			this.isStreaming = true
 			try {
 				for await (const chunk of stream) {
 					if (!chunk) {
-						// Sometimes chunk is undefined, no idea that can cause it, but this workaround seems to fix it
+						// 有时 chunk 是 undefined，不知道是什么原因导致的，但这个解决方法似乎可以修复它
 						continue
 					}
 					switch (chunk.type) {
@@ -2950,13 +2942,13 @@ export class Cline {
 							break
 						case "text":
 							assistantMessage += chunk.text
-							// parse raw assistant message into content blocks
+							// 将原始助手消息解析为内容块
 							const prevLength = this.assistantMessageContent.length
 							this.assistantMessageContent = parseAssistantMessage(assistantMessage)
 							if (this.assistantMessageContent.length > prevLength) {
-								this.userMessageContentReady = false // new content we need to present, reset to false in case previous content set this to true
+								this.userMessageContentReady = false // 新内容我们需要呈现，重置为 false，以防之前的内容将其设置为 true
 							}
-							// present content to user
+							// 向用户呈现内容
 							this.presentAssistantMessage()
 							break
 					}
@@ -2965,22 +2957,22 @@ export class Cline {
 						console.log(`aborting stream, this.abandoned = ${this.abandoned}`)
 
 						if (!this.abandoned) {
-							// only need to gracefully abort if this instance isn't abandoned (sometimes openrouter stream hangs, in which case this would affect future instances of cline)
+							// 只有在这个实例没有被放弃时才需要优雅地中止（有时 openrouter 流会挂起，在这种情况下，这会影响 cline 的未来实例）
 							await abortStream("user_cancelled")
 						}
 
-						break // aborts the stream
+						break // 中止流
 					}
 
 					if (this.didRejectTool) {
-						// userContent has a tool rejection, so interrupt the assistant's response to present the user's feedback
+						// userContent 有一个工具拒绝，所以中断助手的响应以呈现用户的反馈
 						assistantMessage += "\n\n[Response interrupted by user feedback]"
-						// this.userMessageContentReady = true // instead of setting this premptively, we allow the present iterator to finish and set userMessageContentReady when its ready
+						// this.userMessageContentReady = true // 不是提前设置这个，我们允许呈现迭代器完成并在准备好时设置 userMessageContentReady
 						break
 					}
 
-					// PREV: we need to let the request finish for openrouter to get generation details
-					// UPDATE: it's better UX to interrupt the request at the cost of the api cost not being retrieved
+					// 之前：我们需要让请求完成以获取 openrouter 的生成详细信息
+					// 更新：中断请求以获得更好的用户体验，代价是无法检索 api 成本
 					if (this.didAlreadyUseTool) {
 						assistantMessage +=
 							"\n\n[Response interrupted by a tool use result. Only one tool may be used at a time and should be placed at the end of the message.]"
@@ -2988,9 +2980,9 @@ export class Cline {
 					}
 				}
 			} catch (error) {
-				// abandoned happens when extension is no longer waiting for the cline instance to finish aborting (error is thrown here when any function in the for loop throws due to this.abort)
+				// 当扩展不再等待 cline 实例完成中止时，会发生放弃（当 for 循环中的任何函数由于 this.abort 而抛出错误时，这里会抛出错误）
 				if (!this.abandoned) {
-					this.abortTask() // if the stream failed, there's various states the task could be in (i.e. could have streamed some tools the user may have executed), so we just resort to replicating a cancel task
+					this.abortTask() // 如果流失败，任务可能处于各种状态（即可能已经流式传输了一些用户可能已执行的工具），所以我们只是复制取消任务
 					await abortStream(
 						"streaming_failed",
 						error.message ?? JSON.stringify(serializeError(error), null, 2),
@@ -3005,30 +2997,30 @@ export class Cline {
 				this.isStreaming = false
 			}
 
-			// need to call here in case the stream was aborted
+			// 需要在这里调用，以防流被中止
 			if (this.abort || this.abandoned) {
 				throw new Error("Roo Code instance aborted")
 			}
 
 			this.didCompleteReadingStream = true
 
-			// set any blocks to be complete to allow presentAssistantMessage to finish and set userMessageContentReady to true
-			// (could be a text block that had no subsequent tool uses, or a text block at the very end, or an invalid tool use, etc. whatever the case, presentAssistantMessage relies on these blocks either to be completed or the user to reject a block in order to proceed and eventually set userMessageContentReady to true)
+			// 设置所有块为完成状态，以允许 presentAssistantMessage 完成并将 userMessageContentReady 设置为 true
+			// (可能是没有后续工具使用的文本块，或者是最后的文本块，或者是无效的工具使用等。无论是什么情况，presentAssistantMessage 都依赖于这些块要么完成，要么用户拒绝一个块，以便继续并最终将 userMessageContentReady 设置为 true)
 			const partialBlocks = this.assistantMessageContent.filter((block) => block.partial)
 			partialBlocks.forEach((block) => {
 				block.partial = false
 			})
-			// this.assistantMessageContent.forEach((e) => (e.partial = false)) // cant just do this bc a tool could be in the middle of executing ()
+			// this.assistantMessageContent.forEach((e) => (e.partial = false)) // 不能直接这样做，因为工具可能正在执行中
 			if (partialBlocks.length > 0) {
-				this.presentAssistantMessage() // if there is content to update then it will complete and update this.userMessageContentReady to true, which we pwaitfor before making the next request. all this is really doing is presenting the last partial message that we just set to complete
+				this.presentAssistantMessage() // 如果有内容需要更新，那么它将完成并将 this.userMessageContentReady 更新为 true，我们在发出下一个请求之前会等待这个。这实际上只是呈现我们刚刚设置为完成的最后一个部分消息
 			}
 
 			updateApiReqMsg()
 			await this.saveClineMessages()
 			await this.providerRef.deref()?.postStateToWebview()
 
-			// now add to apiconversationhistory
-			// need to save assistant responses to file before proceeding to tool use since user can exit at any moment and we wouldn't be able to save the assistant's response
+			// 现在添加到 apiconversationhistory
+			// 在进行工具使用之前需要将助手的响应保存到文件中，因为用户可能随时退出，我们将无法保存助手的响应
 			let didEndLoop = false
 			if (assistantMessage.length > 0) {
 				await this.addToApiConversationHistory({
@@ -3036,17 +3028,17 @@ export class Cline {
 					content: [{ type: "text", text: assistantMessage }],
 				})
 
-				// NOTE: this comment is here for future reference - this was a workaround for userMessageContent not getting set to true. It was due to it not recursively calling for partial blocks when didRejectTool, so it would get stuck waiting for a partial block to complete before it could continue.
-				// in case the content blocks finished
-				// it may be the api stream finished after the last parsed content block was executed, so  we are able to detect out of bounds and set userMessageContentReady to true (note you should not call presentAssistantMessage since if the last block is completed it will be presented again)
-				// const completeBlocks = this.assistantMessageContent.filter((block) => !block.partial) // if there are any partial blocks after the stream ended we can consider them invalid
+				// 注意：此注释供将来参考 - 这是 userMessageContent 未设置为 true 的解决方案。这是因为在 didRejectTool 时没有递归调用部分块，所以它会在继续之前卡在等待部分块完成。
+				// 以防内容块完成
+				// 可能是 api 流在最后一个解析的内容块执行后完成，所以我们能够检测到越界并将 userMessageContentReady 设置为 true（注意不应该调用 presentAssistantMessage，因为如果最后一个块已完成，它将再次呈现）
+				// const completeBlocks = this.assistantMessageContent.filter((block) => !block.partial) // 如果流结束后还有任何部分块，我们可以认为它们无效
 				// if (this.currentStreamingContentIndex >= completeBlocks.length) {
 				// 	this.userMessageContentReady = true
 				// }
 
 				await pWaitFor(() => this.userMessageContentReady)
 
-				// if the model did not tool use, then we need to tell it to either use a tool or attempt_completion
+				// 如果模型没有使用工具，那么我们需要告诉它要么使用工具，要么尝试完成
 				const didToolUse = this.assistantMessageContent.some((block) => block.type === "tool_use")
 				if (!didToolUse) {
 					this.userMessageContent.push({
@@ -3059,7 +3051,7 @@ export class Cline {
 				const recDidEndLoop = await this.recursivelyMakeClineRequests(this.userMessageContent)
 				didEndLoop = recDidEndLoop
 			} else {
-				// if there's no assistant_responses, that means we got no text or tool_use content blocks from API which we should assume is an error
+				// 如果没有 assistant_responses，这意味着我们从 API 没有获得任何文本或工具使用内容块，我们应该假设这是一个错误
 				await this.say(
 					"error",
 					"Unexpected API Response: The language model did not provide any assistant messages. This may indicate an issue with the API or the model's output.",
@@ -3070,7 +3062,7 @@ export class Cline {
 				})
 			}
 
-			return didEndLoop // will always be false for now
+			return didEndLoop // 目前始终为 false
 		} catch (error) {
 			// this should never happen since the only thing that can throw an error is the attemptApiRequest, which is wrapped in a try catch that sends an ask where if noButtonClicked, will clear current task and destroy this instance. However to avoid unhandled promise rejection, we will end this loop which will end execution of this instance (see startTask)
 			return true // needs to be true so parent loop knows to end task
