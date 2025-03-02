@@ -1905,13 +1905,50 @@ export class Cline {
 										} satisfies ClineSayTool),
 									)
 									pushToolResult(
-										`The user made the following updates to your content:\n\n${userEdits}\n\n` +
-											`The updated content, which includes both your original modifications and the user's edits, has been successfully saved to ${relPath.toPosix()}. Here is the full, updated content of the file, including line numbers:\n\n` +
+										/**
+										 * 用户对内容进行了以下更新。
+										 *
+										 * @param userEdits - 用户的编辑内容。
+										 * @returns 更新后的完整文件内容，包括行号。
+										 */
+										`用户对内容进行了以下更新：\n\n${userEdits}\n\n` +
+											/**
+											 * 更新后的内容，包括用户的编辑和原始修改，已成功保存到指定路径。
+											 *
+											 * @param relPath - 文件的相对路径。
+											 * @returns 包含行号的完整更新内容。
+											 */
+											`更新后的内容，包括用户的编辑和原始修改，已成功保存到 ${relPath.toPosix()}。以下是文件的完整更新内容，包括行号：\n\n` +
+											/**
+											 * 最终文件内容的 XML 标签。
+											 *
+											 * @param finalContent - 最终文件内容。
+											 * @returns 包含行号的最终文件内容。
+											 */
 											`<final_file_content path="${relPath.toPosix()}">\n${addLineNumbers(finalContent || "")}\n</final_file_content>\n\n` +
-											`Please note:\n` +
-											`1. You do not need to re-write the file with these changes, as they have already been applied.\n` +
-											`2. Proceed with the task using this updated file content as the new baseline.\n` +
-											`3. If the user's edits have addressed part of the task or changed the requirements, adjust your approach accordingly.` +
+											/**
+											 * 注意事项。
+											 *
+											 * @returns 提示用户不需要重新写入文件，并继续使用更新后的内容。
+											 */
+											`请注意：\n` +
+											/**
+											 * 提示用户不需要重新写入文件，因为更改已应用。
+											 */
+											`1. 您不需要重新写入文件，因为这些更改已经应用。\n` +
+											/**
+											 * 提示用户使用更新后的文件内容作为新基线继续任务。
+											 */
+											`2. 使用更新后的文件内容作为新基线继续任务。\n` +
+											/**
+											 * 如果用户的编辑解决了部分任务或更改了要求，调整您的方法。
+											 */
+											`3. 如果用户的编辑解决了部分任务或更改了要求，请相应地调整您的方法。` +
+											/**
+											 * 新问题消息。
+											 *
+											 * @param newProblemsMessage - 新的问题消息。
+											 */
 											`${newProblemsMessage}`,
 									)
 								} else {
@@ -2783,8 +2820,18 @@ export class Cline {
 			const { response, text, images } = await this.ask(
 				"mistake_limit_reached",
 				this.api.getModel().id.includes("claude")
-					? `This may indicate a failure in his thought process or inability to use a tool properly, which can be mitigated with some user guidance (e.g. "Try breaking down the task into smaller steps").`
-					: "Roo Code uses complex prompts and iterative task execution that may be challenging for less capable models. For best results, it's recommended to use Claude 3.7 Sonnet for its advanced agentic coding capabilities.",
+					? /**
+						 * 这可能表明他的思维过程失败或无法正确使用工具，
+						 * 可以通过一些用户指导来缓解（例如，“尝试将任务分解为更小的步骤”）。
+						 */
+						`这可能表明他的思维过程失败或无法正确使用工具，可以通过一些用户指导来缓解（例如，“尝试将任务分解为更小的步骤”）。`
+					: /**
+						 * Roo Code 使用复杂的提示和迭代任务执行，
+						 * 对于能力较弱的模型可能具有挑战性。
+						 * 为了获得最佳效果，建议使用 Claude 3.7 Sonnet，
+						 * 因为它具有先进的代理编码能力。
+						 */
+						"Roo Code 使用复杂的提示和迭代任务执行，对于能力较弱的模型可能具有挑战性。为了获得最佳效果，建议使用 Claude 3.7 Sonnet，因为它具有先进的代理编码能力。",
 			)
 			if (response === "messageResponse") {
 				userContent.push(
@@ -2891,8 +2938,15 @@ export class Cline {
 								assistantMessage +
 								`\n\n[${
 									cancelReason === "streaming_failed"
-										? "Response interrupted by API Error"
-										: "Response interrupted by user"
+										? /**
+											 * 检查响应是否被中断。
+											 *
+											 * 如果响应被中断，返回相应的错误信息。
+											 *
+											 * @returns 如果是 API 错误中断，返回 "响应被 API 错误中断"；如果是用户中断，返回 "响应被用户中断"。
+											 */
+											"响应被 API 错误中断"
+										: "响应被用户中断"
 								}]`,
 						},
 					],
