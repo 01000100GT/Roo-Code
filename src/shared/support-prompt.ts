@@ -35,7 +35,7 @@ const supportPromptConfigs: Record<string, SupportPromptConfig> = {
 		label: "Enhance Prompt",
 		description:
 			"使用即时增强功能为您的输入提供量身定制的建议或改进。这可以确保Roo理解您的意图，并提供最佳的响应。可通过 ✨ 图标在聊天中使用。",
-		template: `Generate an enhanced version of this prompt (reply with only the enhanced prompt - no conversation, explanations, lead-in, bullet points, placeholders, or surrounding quotes):
+		template: `生成此提示的增强版本（仅使用增强的提示进行回复-没有对话、解释、引言、要点、占位符或周围的引号）：
 
 \${userInput}`,
 	},
@@ -43,23 +43,23 @@ const supportPromptConfigs: Record<string, SupportPromptConfig> = {
 		label: "Explain Code",
 		description:
 			"获取代码片段、函数或整个文件的详细解释。有助于理解复杂代码或学习新模式。在代码操作（编辑器中的灯泡图标）和编辑器上下文菜单（右键单击所选代码）中可用。",
-		template: `Explain the following code from file path @/\${filePath}:
+		template: `解释文件路径中的以下代码 @/\${filePath}:
 \${userInput}
 
 \`\`\`
 \${selectedText}
 \`\`\`
 
-Please provide a clear and concise explanation of what this code does, including:
-1. The purpose and functionality
-2. Key components and their interactions
-3. Important patterns or techniques used`,
+请清晰简洁地解释此代码的作用，包括：
+1.目的和功能
+2.关键组成部分及其相互作用
+3.使用的重要图案或技术`,
 	},
 	FIX: {
 		label: "Fix Issues",
 		description:
 			"获取识别和解决bug、错误或代码质量问题的帮助。提供解决问题的分步指导。在代码操作（编辑器中的灯泡图标）和编辑器上下文菜单（右键单击所选代码）中可用。",
-		template: `Fix any issues in the following code from file path @/\${filePath}
+		template: `从文件路径修复以下代码中的任何问题 @/\${filePath}
 \${diagnosticText}
 \${userInput}
 
@@ -67,30 +67,30 @@ Please provide a clear and concise explanation of what this code does, including
 \${selectedText}
 \`\`\`
 
-Please:
-1. Address all detected problems listed above (if any)
-2. Identify any other potential bugs or issues
-3. Provide corrected code
-4. Explain what was fixed and why`,
+请:
+1.解决上面列出的所有检测到的问题（如果有的话）
+2.识别任何其他潜在的错误或问题
+3.提供正确的代码
+4.解释已修复的内容及其原因`,
 	},
 	IMPROVE: {
 		label: "Improve Code",
 		description:
 			"在维护功能的同时，接收代码优化、更好实践和架构改进的建议。在代码操作（编辑器中的灯泡图标）和编辑器上下文菜单（右键单击所选代码）中可用。",
-		template: `Improve the following code from file path @/\${filePath}:
+		template: `从文件路径改进以下代码 @/\${filePath}:
 \${userInput}
 
 \`\`\`
 \${selectedText}
 \`\`\`
 
-Please suggest improvements for:
-1. Code readability and maintainability
-2. Performance optimization
-3. Best practices and patterns
-4. Error handling and edge cases
+请就以下方面提出改进建议：
+1.代码可读性和可维护性
+2.性能优化
+3.最佳做法和模式
+4.错误处理和边缘情况
 
-Provide the improved code along with explanations for each enhancement.`,
+提供改进后的代码以及对每个增强功能的解释。`,
 	},
 	ADD_TO_CONTEXT: {
 		label: "Add to Context",
@@ -106,7 +106,7 @@ Provide the improved code along with explanations for each enhancement.`,
 		description:
 			"将终端输出添加到当前任务或对话中。可用于提供命令输出或日志。在终端上下文菜单中可用（右键单击选定的终端内容）。",
 		template: `\${userInput}
-Terminal output:
+终端输出:
 \`\`\`
 \${terminalContent}
 \`\`\``,
@@ -116,30 +116,30 @@ Terminal output:
 		description:
 			"获取帮助，修复失败或需要改进的终端命令。在终端上下文菜单中可用（右键单击选定的终端内容）。",
 		template: `\${userInput}
-Fix this terminal command:
+修复此终端命令：
 \`\`\`
 \${terminalContent}
 \`\`\`
 
-Please:
-1. Identify any issues in the command
-2. Provide the corrected command
-3. Explain what was fixed and why`,
+请:
+1.识别命令中的任何问题
+2.提供正确的命令
+3.解释已修复的内容及其原因`,
 	},
 	TERMINAL_EXPLAIN: {
 		label: "Explain Terminal Command",
 		description:
 			"获取终端命令及其输出的详细说明。在终端上下文菜单中可用（右键单击选定的终端内容）。",
 		template: `\${userInput}
-Explain this terminal command:
+解释此终端命令:
 \`\`\`
 \${terminalContent}
 \`\`\`
 
-Please provide:
-1. What the command does
-2. Explanation of each part/flag
-3. Expected output and behavior`,
+请提供：
+1.命令的作用是什么
+2.每个部分/标志的说明
+3.预期产出和行为`,
 	},
 } as const
 
