@@ -1,5 +1,12 @@
 # Roo Code Changelog
 
+## 3.12.4
+
+### Patch Changes
+
+- Add missing translation
+- Clean up types related to tools
+
 ## [3.12.3] - 2025-04-17
 
 - Fix character escaping issues in Gemini diff edits
