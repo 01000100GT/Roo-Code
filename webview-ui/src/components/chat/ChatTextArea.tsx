@@ -113,7 +113,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		useEffect(() => {
 			const messageHandler = (event: MessageEvent) => {
 				const message = event.data
-
+				console.log("收到消息类型:", message.type) // 添加通用日志
 				if (message.type === "enhancedPrompt") {
 					if (message.text) {
 						setInputValue(message.text)
@@ -1131,10 +1131,17 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 									// 当启用轮换时，自动取消当前选中的配置，ask或code 旁边的llm单选模式被禁用
 									if (newValue) {
 										vscode.postMessage({ type: "loadApiConfigurationById", text: "" })
-										console.log("测试LLM分组 -- 1")
-										// ssj 2025-04-18 增加rotation 后端请求
-										// 如果选中了复选框，请求获取所有 API 配置信息
-										vscode.postMessage({ type: "getAllApiConfigurations" })
+										// console.log("测试LLM分组 -- 1")
+										// // ssj 2025-04-18 增加rotation 后端请求
+										// // 如果选中了复选框，请求获取所有 API 配置信息
+										// vscode.postMessage({ type: "getAllApiConfigurations" })
+										// console.log("测试LLM分组 -- 2")
+										console.log("发送获取所有 API 配置请求")
+										vscode.postMessage({
+											type: "getAllApiConfigurations",
+											requestId: Date.now().toString(), // 添加请求 ID 以便跟踪
+										})
+										console.log("已发送获取所有 API 配置请求")
 									}
 								}}
 								disabled={textAreaDisabled}
