@@ -3,8 +3,7 @@ dist
 out
 out-*
 node_modules
-coverage/
-
+coverage/ 
 .DS_Store
 
 # Builds
@@ -35,3 +34,4 @@ logs
 
 # Vite development
 .vite-port
+src/exports/types.ts
