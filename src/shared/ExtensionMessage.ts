@@ -207,6 +207,9 @@ export type ExtensionState = Pick<
 
 	renderContext: "sidebar" | "editor"
 	settingsImportedAt?: number
+
+	// ssj 2025-04-02 rotation llm 添加属性定义
+	roo_cline_rotation_enabled: boolean // 添加这一行
 }
 
 export type { ClineMessage, ClineAsk, ClineSay }

@@ -1216,6 +1216,8 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 			telemetrySetting,
 			showRooIgnoredFiles,
 			language,
+			// ssj 2025-04-02 rotation llm 添加属性定义
+			roo_cline_rotation_enabled,
 			showGreeting,
 			maxReadFileLine,
 		} = await this.getState()
@@ -1295,6 +1297,8 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 			showRooIgnoredFiles: showRooIgnoredFiles ?? true,
 			language,
 			renderContext: this.renderContext,
+			// ssj 2025-04-02 rotation llm 添加属性定义
+			roo_cline_rotation_enabled: roo_cline_rotation_enabled ?? false, // 添加
 			maxReadFileLine: maxReadFileLine ?? 500,
 			settingsImportedAt: this.settingsImportedAt,
 			showGreeting: showGreeting ?? true, // Ensure showGreeting is included in the returned state
@@ -1385,6 +1389,8 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 			telemetrySetting: stateValues.telemetrySetting || "unset",
 			showRooIgnoredFiles: stateValues.showRooIgnoredFiles ?? true,
 			maxReadFileLine: stateValues.maxReadFileLine ?? 500,
+			// ssj 2025-04-02 rotation llm 添加属性定义
+			roo_cline_rotation_enabled: stateValues.roo_cline_rotation_enabled ?? false, // 添加缺失的属性
 			showGreeting: stateValues.showGreeting ?? true, // Ensure showGreeting is returned by getState
 		}
 	}

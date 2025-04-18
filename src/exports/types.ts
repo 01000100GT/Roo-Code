@@ -274,6 +274,8 @@ type GlobalSettings = {
 	maxWorkspaceFiles?: number | undefined
 	showRooIgnoredFiles?: boolean | undefined
 	maxReadFileLine?: number | undefined
+	// ssj 增加属性定义
+	roo_cline_rotation_enabled?: boolean | undefined
 	terminalOutputLineLimit?: number | undefined
 	terminalShellIntegrationTimeout?: number | undefined
 	terminalCommandDelay?: number | undefined
