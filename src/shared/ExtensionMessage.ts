@@ -69,6 +69,8 @@ export interface ExtensionMessage {
 		| "fileSearchResults"
 		| "toggleApiConfigPin"
 		| "acceptInput"
+		// ssj 2025-04-18 添加rotation 后端响应
+		| "allApiConfigurations" // Add this type for the response
 	text?: string
 	action?:
 		| "chatButtonClicked"
@@ -112,6 +114,8 @@ export interface ExtensionMessage {
 		label?: string
 	}>
 	error?: string
+	// ssj 2025-04-18 添加rotation 后端响应
+	allApiConfigurations?: { configs: Record<string, ApiConfiguration>; meta: ApiConfigMeta[] }
 }
 
 export type ExtensionState = Pick<

@@ -128,6 +128,8 @@ export interface WebviewMessage {
 		// ssj 2025-04-02 rotation llm
 		| "updateRotationEnabled"
 		| "showGreeting"
+		// ssj 2025-04-18 添加rotation 后端响应
+		| "getAllApiConfigurations" // <--- 在这里添加新的类型
 	text?: string
 	disabled?: boolean
 	askResponse?: ClineAskResponse

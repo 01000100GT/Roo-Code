@@ -5,7 +5,8 @@ import DynamicTextArea from "react-textarea-autosize"
 import { mentionRegex, mentionRegexGlobal } from "../../../../src/shared/context-mentions"
 import { WebviewMessage } from "../../../../src/shared/WebviewMessage"
 import { Mode, getAllModes } from "../../../../src/shared/modes"
-import { ExtensionMessage } from "../../../../src/shared/ExtensionMessage"
+// ssj 2025-04-18 增加rotation的后端处理 添加 ApiConfigMeta
+import { ExtensionMessage, ApiConfigMeta } from "../../../../src/shared/ExtensionMessage"
 
 import { vscode } from "@/utils/vscode"
 import { useExtensionState } from "@/context/ExtensionStateContext"
@@ -107,6 +108,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			return () => document.removeEventListener("mousedown", handleClickOutside)
 		}, [showDropdown])
 
+		// ssj 2024-04-18 这里会添加对 rotation的 onchange的处理
 		// Handle enhanced prompt response and search results.
 		useEffect(() => {
 			const messageHandler = (event: MessageEvent) => {
@@ -133,6 +135,29 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					if (message.requestId === searchRequestId) {
 						setFileSearchResults(message.results || [])
 					}
+				} else if (message.type === "allApiConfigurations") {
+					// ssj 2025-04-18 这里应该添加对 "allApiConfigurations" 消息类型的处理
+					// 处理接收到的所有 API 配置信息
+					console.group("所有 API 配置信息")
+
+					// 输出元数据列表
+					console.log("配置组列表:", message.allApiConfigurations?.meta)
+
+					// 输出详细配置信息
+					console.log("详细配置信息:", message.allApiConfigurations?.configs)
+
+					// 按组显示配置
+					if (message.allApiConfigurations?.meta && message.allApiConfigurations?.configs) {
+						console.group("按组显示配置")
+						message.allApiConfigurations.meta.forEach((config: ApiConfigMeta) => {
+							console.group(`组: ${config.name} (ID: ${config.id})`)
+							console.log("详细信息:", message.allApiConfigurations?.configs[config.id])
+							console.groupEnd()
+						})
+						console.groupEnd()
+					}
+
+					console.groupEnd()
 				}
 			}
 
@@ -1097,6 +1122,8 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 								// 注意这里用的是 roo_cline_rotation_enabled的别名 rotationEnabled，前面定义
 								checked={rotationEnabled} // 使用context中的状态，读取当前状态值
 								onChange={() => {
+									console.log("rotationEnabled", rotationEnabled)
+
 									// const newValue = !rotationEnabled
 									const newValue = !rotationEnabled
 									setRooClineRotationEnabled(newValue) // 更新本地状态
@@ -1104,6 +1131,10 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 									// 当启用轮换时，自动取消当前选中的配置，ask或code 旁边的llm单选模式被禁用
 									if (newValue) {
 										vscode.postMessage({ type: "loadApiConfigurationById", text: "" })
+										console.log("测试LLM分组 -- 1")
+										// ssj 2025-04-18 增加rotation 后端请求
+										// 如果选中了复选框，请求获取所有 API 配置信息
+										vscode.postMessage({ type: "getAllApiConfigurations" })
 									}
 								}}
 								disabled={textAreaDisabled}

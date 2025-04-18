@@ -1,7 +1,9 @@
 import { VSCodeButton, VSCodeLink } from "@vscode/webview-ui-toolkit/react"
 import debounce from "debounce"
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react"
-import { useDeepCompareEffect, useEvent, useMount } from "react-use"
+// import { useDeepCompareEffect, useEvent, useMount } from "react-use"
+// ssj 修复警告 移除 useDeepCompareEffect，保留其他导入
+import { useEvent, useMount } from "react-use"
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso"
 import styled from "styled-components"
 import {
@@ -111,15 +113,160 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 	const lastMessage = useMemo(() => messages.at(-1), [messages])
 	const secondLastMessage = useMemo(() => messages.at(-2), [messages])
 
-	function playSound(audioType: AudioType) {
+	const isReadOnlyToolAction = useCallback((message: ClineMessage | undefined) => {
+		if (message?.type === "ask") {
+			if (!message.text) {
+				return true
+			}
+			const tool = JSON.parse(message.text)
+			return [
+				"readFile",
+				"listFiles",
+				"listFilesTopLevel",
+				"listFilesRecursive",
+				"listCodeDefinitionNames",
+				"searchFiles",
+			].includes(tool.tool)
+		}
+		return false
+	}, [])
+
+	const isWriteToolAction = useCallback((message: ClineMessage | undefined) => {
+		if (message?.type === "ask") {
+			if (!message.text) {
+				return true
+			}
+			const tool = JSON.parse(message.text)
+			return ["editedExistingFile", "appliedDiff", "newFileCreated"].includes(tool.tool)
+		}
+		return false
+	}, [])
+
+	const isMcpToolAlwaysAllowed = useCallback(
+		(message: ClineMessage | undefined) => {
+			if (message?.type === "ask" && message.ask === "use_mcp_server") {
+				if (!message.text) {
+					return true
+				}
+				const mcpServerUse = JSON.parse(message.text) as { type: string; serverName: string; toolName: string }
+				if (mcpServerUse.type === "use_mcp_tool") {
+					const server = mcpServers?.find((s: McpServer) => s.name === mcpServerUse.serverName)
+					const tool = server?.tools?.find((t: McpTool) => t.name === mcpServerUse.toolName)
+					return tool?.alwaysAllow || false
+				}
+			}
+			return false
+		},
+		[mcpServers],
+	)
+
+	// Check if a command message is allowed
+	const isAllowedCommand = useCallback(
+		(message: ClineMessage | undefined): boolean => {
+			if (message?.type !== "ask") return false
+			return validateCommand(message.text || "", allowedCommands || [])
+		},
+		[allowedCommands],
+	)
+
+	const isAutoApproved = useCallback(
+		(message: ClineMessage | undefined) => {
+			if (!autoApprovalEnabled || !message || message.type !== "ask") return false
+
+			if (message.ask === "browser_action_launch") {
+				return alwaysAllowBrowser
+			}
+
+			if (message.ask === "use_mcp_server") {
+				return alwaysAllowMcp && isMcpToolAlwaysAllowed(message)
+			}
+
+			if (message.ask === "command") {
+				return alwaysAllowExecute && isAllowedCommand(message)
+			}
+
+			// For read/write operations, check if it's outside workspace and if we have permission for that
+			if (message.ask === "tool") {
+				let tool: any = {}
+				try {
+					tool = JSON.parse(message.text || "{}")
+				} catch (error) {
+					console.error("Failed to parse tool:", error)
+				}
+
+				if (!tool) {
+					return false
+				}
+
+				if (tool?.tool === "fetchInstructions") {
+					if (tool.content === "create_mode") {
+						return alwaysAllowModeSwitch
+					}
+					if (tool.content === "create_mcp_server") {
+						return alwaysAllowMcp
+					}
+				}
+
+				if (tool?.tool === "switchMode") {
+					return alwaysAllowModeSwitch
+				}
+
+				if (["newTask", "finishTask"].includes(tool?.tool)) {
+					return alwaysAllowSubtasks
+				}
+
+				const isOutsideWorkspace = !!tool.isOutsideWorkspace
+
+				if (isReadOnlyToolAction(message)) {
+					return alwaysAllowReadOnly && (!isOutsideWorkspace || alwaysAllowReadOnlyOutsideWorkspace)
+				}
+
+				if (isWriteToolAction(message)) {
+					return alwaysAllowWrite && (!isOutsideWorkspace || alwaysAllowWriteOutsideWorkspace)
+				}
+			}
+
+			return false
+		},
+		[
+			autoApprovalEnabled,
+			alwaysAllowBrowser,
+			alwaysAllowReadOnly,
+			alwaysAllowReadOnlyOutsideWorkspace,
+			isReadOnlyToolAction,
+			alwaysAllowWrite,
+			alwaysAllowWriteOutsideWorkspace,
+			isWriteToolAction,
+			alwaysAllowExecute,
+			isAllowedCommand,
+			alwaysAllowMcp,
+			isMcpToolAlwaysAllowed,
+			alwaysAllowModeSwitch,
+			alwaysAllowSubtasks,
+		],
+	)
+
+	// function playSound(audioType: AudioType) {
+	// 	vscode.postMessage({ type: "playSound", audioType })
+	// }
+
+	// 将 playSound 函数用 useCallback 包装
+	const playSound = useCallback((audioType: AudioType) => {
 		vscode.postMessage({ type: "playSound", audioType })
-	}
+	}, []) // 空依赖数组表示这个函数不依赖于任何会变化的值
 
-	function playTts(text: string) {
+	// function playTts(text: string) {
+	// 	vscode.postMessage({ type: "playTts", text })
+	// }
+
+	// 同样，也应该对 playTts 函数进行相同的处理
+	const playTts = useCallback((text: string) => {
 		vscode.postMessage({ type: "playTts", text })
-	}
+	}, [])
 
-	useDeepCompareEffect(() => {
+	// useDeepCompareEffect(() => {
+	// ssj 修复警告 将 useDeepCompareEffect 替换为 useEffect
+	useEffect(() => {
 		// if last message is an ask, show user ask UI
 		// if user finished a task, then start a new task with a new conversation history since in this moment that the extension is waiting for user response, the user could close the extension and the conversation history would be lost.
 		// basically as long as a task is active, the conversation history will be persisted
@@ -280,7 +427,8 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 			// setPrimaryButtonText(undefined)
 			// setSecondaryButtonText(undefined)
 		}
-	}, [lastMessage, secondLastMessage])
+		// }, [lastMessage, secondLastMessage])
+	}, [lastMessage, secondLastMessage, t, playSound, isAutoApproved]) // 确保添加所有依赖项
 
 	useEffect(() => {
 		if (messages.length === 0) {
@@ -603,139 +751,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		})
 	}, [modifiedMessages])
 
-	const isReadOnlyToolAction = useCallback((message: ClineMessage | undefined) => {
-		if (message?.type === "ask") {
-			if (!message.text) {
-				return true
-			}
-			const tool = JSON.parse(message.text)
-			return [
-				"readFile",
-				"listFiles",
-				"listFilesTopLevel",
-				"listFilesRecursive",
-				"listCodeDefinitionNames",
-				"searchFiles",
-			].includes(tool.tool)
-		}
-		return false
-	}, [])
-
-	const isWriteToolAction = useCallback((message: ClineMessage | undefined) => {
-		if (message?.type === "ask") {
-			if (!message.text) {
-				return true
-			}
-			const tool = JSON.parse(message.text)
-			return ["editedExistingFile", "appliedDiff", "newFileCreated"].includes(tool.tool)
-		}
-		return false
-	}, [])
-
-	const isMcpToolAlwaysAllowed = useCallback(
-		(message: ClineMessage | undefined) => {
-			if (message?.type === "ask" && message.ask === "use_mcp_server") {
-				if (!message.text) {
-					return true
-				}
-				const mcpServerUse = JSON.parse(message.text) as { type: string; serverName: string; toolName: string }
-				if (mcpServerUse.type === "use_mcp_tool") {
-					const server = mcpServers?.find((s: McpServer) => s.name === mcpServerUse.serverName)
-					const tool = server?.tools?.find((t: McpTool) => t.name === mcpServerUse.toolName)
-					return tool?.alwaysAllow || false
-				}
-			}
-			return false
-		},
-		[mcpServers],
-	)
-
-	// Check if a command message is allowed
-	const isAllowedCommand = useCallback(
-		(message: ClineMessage | undefined): boolean => {
-			if (message?.type !== "ask") return false
-			return validateCommand(message.text || "", allowedCommands || [])
-		},
-		[allowedCommands],
-	)
-
-	const isAutoApproved = useCallback(
-		(message: ClineMessage | undefined) => {
-			if (!autoApprovalEnabled || !message || message.type !== "ask") return false
-
-			if (message.ask === "browser_action_launch") {
-				return alwaysAllowBrowser
-			}
-
-			if (message.ask === "use_mcp_server") {
-				return alwaysAllowMcp && isMcpToolAlwaysAllowed(message)
-			}
-
-			if (message.ask === "command") {
-				return alwaysAllowExecute && isAllowedCommand(message)
-			}
-
-			// For read/write operations, check if it's outside workspace and if we have permission for that
-			if (message.ask === "tool") {
-				let tool: any = {}
-				try {
-					tool = JSON.parse(message.text || "{}")
-				} catch (error) {
-					console.error("Failed to parse tool:", error)
-				}
-
-				if (!tool) {
-					return false
-				}
-
-				if (tool?.tool === "fetchInstructions") {
-					if (tool.content === "create_mode") {
-						return alwaysAllowModeSwitch
-					}
-					if (tool.content === "create_mcp_server") {
-						return alwaysAllowMcp
-					}
-				}
-
-				if (tool?.tool === "switchMode") {
-					return alwaysAllowModeSwitch
-				}
-
-				if (["newTask", "finishTask"].includes(tool?.tool)) {
-					return alwaysAllowSubtasks
-				}
-
-				const isOutsideWorkspace = !!tool.isOutsideWorkspace
-
-				if (isReadOnlyToolAction(message)) {
-					return alwaysAllowReadOnly && (!isOutsideWorkspace || alwaysAllowReadOnlyOutsideWorkspace)
-				}
-
-				if (isWriteToolAction(message)) {
-					return alwaysAllowWrite && (!isOutsideWorkspace || alwaysAllowWriteOutsideWorkspace)
-				}
-			}
-
-			return false
-		},
-		[
-			autoApprovalEnabled,
-			alwaysAllowBrowser,
-			alwaysAllowReadOnly,
-			alwaysAllowReadOnlyOutsideWorkspace,
-			isReadOnlyToolAction,
-			alwaysAllowWrite,
-			alwaysAllowWriteOutsideWorkspace,
-			isWriteToolAction,
-			alwaysAllowExecute,
-			isAllowedCommand,
-			alwaysAllowMcp,
-			isMcpToolAlwaysAllowed,
-			alwaysAllowModeSwitch,
-			alwaysAllowSubtasks,
-		],
-	)
-
 	useEffect(() => {
 		// this ensures the first message is not read, future user messages are labelled as user_feedback
 		if (lastMessage && messages.length > 1) {
@@ -797,7 +812,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		}
 		// Update previous value
 		setWasStreaming(isStreaming)
-	}, [isStreaming, lastMessage, wasStreaming, isAutoApproved, messages.length])
+	}, [isStreaming, lastMessage, wasStreaming, isAutoApproved, messages.length, playSound, playTts])
 
 	const isBrowserSessionMessage = (message: ClineMessage): boolean => {
 		// which of visible messages are browser session messages, see above

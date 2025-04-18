@@ -202,6 +202,8 @@ describe("mergeExtensionState", () => {
 			showRooIgnoredFiles: true,
 			renderContext: "sidebar",
 			maxReadFileLine: 500,
+			// ssj 2025-04-18
+			roo_cline_rotation_enabled: false, // 或者根据你的需求设置为 true
 		}
 
 		const prevState: ExtensionState = {
