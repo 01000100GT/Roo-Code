@@ -114,6 +114,10 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			const messageHandler = (event: MessageEvent) => {
 				const message = event.data
 				console.log("收到消息类型:", message.type) // 添加通用日志
+
+				// 为所有消息添加通用日志
+				console.log("%c[收到消息]", "color: #673AB7;", message.type, message);
+
 				if (message.type === "enhancedPrompt") {
 					if (message.text) {
 						setInputValue(message.text)
@@ -136,34 +140,59 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						setFileSearchResults(message.results || [])
 					}
 				} else if (message.type === "allApiConfigurations") {
-					// ssj 2025-04-18 这里应该添加对 "allApiConfigurations" 消息类型的处理
-					// 处理接收到的所有 API 配置信息
-					console.group("所有 API 配置信息")
+					// // ssj 2025-04-18 这里应该添加对 "allApiConfigurations" 消息类型的处理
+					// // 处理接收到的所有 API 配置信息
+					// console.group("所有 API 配置信息")
+					// // 改进日志输出
+					// console.group("%c[API配置信息]", "color: #009688; font-weight: bold;");
 
-					// 输出元数据列表
-					console.log("配置组列表:", message.allApiConfigurations?.meta)
+					// // 输出元数据列表
+					// console.log("配置组列表:", message.allApiConfigurations?.meta)
 
-					// 输出详细配置信息
-					console.log("详细配置信息:", message.allApiConfigurations?.configs)
+					// // 输出详细配置信息
+					// console.log("详细配置信息:", message.allApiConfigurations?.configs)
 
-					// 按组显示配置
-					if (message.allApiConfigurations?.meta && message.allApiConfigurations?.configs) {
-						console.group("按组显示配置")
-						message.allApiConfigurations.meta.forEach((config: ApiConfigMeta) => {
-							console.group(`组: ${config.name} (ID: ${config.id})`)
-							console.log("详细信息:", message.allApiConfigurations?.configs[config.id])
-							console.groupEnd()
-						})
-						console.groupEnd()
+					// // 按组显示配置
+					// if (message.allApiConfigurations?.meta && message.allApiConfigurations?.configs) {
+					// 	console.group("按组显示配置")
+					// 	message.allApiConfigurations.meta.forEach((config: ApiConfigMeta) => {
+					// 		console.group(`组: ${config.name} (ID: ${config.id})`)
+					// 		console.log("详细信息:", message.allApiConfigurations?.configs[config.id])
+					// 		console.groupEnd()
+					// 	})
+					// 	console.groupEnd()
+					// }
+
+					// console.groupEnd()
+					// 改进日志输出
+					console.group("%c[API配置信息]", "color: #009688; font-weight: bold;");
+
+					if (!message.allApiConfigurations) {
+						console.warn("%c格式错误 - 缺少 allApiConfigurations 字段", "color: #FF5722;");
+						console.log("完整消息:", JSON.stringify(message, null, 2));
+					} else {
+						console.log("元数据:", message.allApiConfigurations?.meta);
+						console.log("配置详情:", message.allApiConfigurations?.configs);
+
+						if (message.allApiConfigurations?.meta && message.allApiConfigurations?.configs) {
+							console.group("按组显示");
+							message.allApiConfigurations.meta.forEach((config: ApiConfigMeta) => {
+								console.group(`组: ${config.name} (ID: ${config.id})`);
+								console.log("详情:", message.allApiConfigurations?.configs[config.id]);
+								console.groupEnd();
+							});
+							console.groupEnd();
+						}
 					}
 
-					console.groupEnd()
+					console.groupEnd();
 				}
 			}
 
 			window.addEventListener("message", messageHandler)
 			return () => window.removeEventListener("message", messageHandler)
-		}, [setInputValue, searchRequestId])
+			// 添加rotationEnabled 为什么？ 确保在组件卸载时移除事件监听器
+		}, [setInputValue, searchRequestId, rotationEnabled])
 
 		const [isDraggingOver, setIsDraggingOver] = useState(false)
 		const [textAreaBaseHeight, setTextAreaBaseHeight] = useState<number | undefined>(undefined)
@@ -1026,15 +1055,15 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 										.sort((a, b) => a.label.localeCompare(b.label)),
 									// If we have pinned items and unpinned items, add a separator
 									...(pinnedApiConfigs &&
-									Object.keys(pinnedApiConfigs).length > 0 &&
-									(listApiConfigMeta || []).some((config) => !pinnedApiConfigs[config.id])
+										Object.keys(pinnedApiConfigs).length > 0 &&
+										(listApiConfigMeta || []).some((config) => !pinnedApiConfigs[config.id])
 										? [
-												{
-													value: "sep-pinned",
-													label: t("chat:separator"),
-													type: DropdownOptionType.SEPARATOR,
-												},
-											]
+											{
+												value: "sep-pinned",
+												label: t("chat:separator"),
+												type: DropdownOptionType.SEPARATOR,
+											},
+										]
 										: []),
 									// Unpinned items sorted alphabetically
 									...(listApiConfigMeta || [])
@@ -1122,25 +1151,53 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 								// 注意这里用的是 roo_cline_rotation_enabled的别名 rotationEnabled，前面定义
 								checked={rotationEnabled} // 使用context中的状态，读取当前状态值
 								onChange={() => {
-									console.log("rotationEnabled", rotationEnabled)
+									console.log("rotationEnabled：", rotationEnabled)
+
+									// 增加更详细的日志
+									console.log("%c[LLM轮换] 当前状态变更", "color: #4CAF50; font-weight: bold;",
+										{ 当前状态: rotationEnabled, 新状态: !rotationEnabled });
 
 									// const newValue = !rotationEnabled
 									const newValue = !rotationEnabled
 									setRooClineRotationEnabled(newValue) // 更新本地状态
+
+									// 记录发送消息前的状态
+									console.log("%c[LLM轮换] 发送更新状态消息", "color: #2196F3; font-weight: bold;",
+										{ type: "updateRotationEnabled", bool: newValue });
+
 									vscode.postMessage({ type: "updateRotationEnabled", bool: newValue })
+
+									console.log("%c[LLM轮换] 状态消息已发送", "color: #2196F3;");
+
 									// 当启用轮换时，自动取消当前选中的配置，ask或code 旁边的llm单选模式被禁用
 									if (newValue) {
+
+										console.log("%c[LLM轮换] 清除当前API配置", "color: #FF9800;");
+
+
 										vscode.postMessage({ type: "loadApiConfigurationById", text: "" })
+
+										// 请求获取所有API配置信息
+										const requestId = Date.now().toString();
+										console.log("%c[LLM轮换] 准备发送获取所有API配置请求", "color: #E91E63;",
+											{ requestId: requestId });
+
+
 										// console.log("测试LLM分组 -- 1")
 										// // ssj 2025-04-18 增加rotation 后端请求
 										// // 如果选中了复选框，请求获取所有 API 配置信息
 										// vscode.postMessage({ type: "getAllApiConfigurations" })
 										// console.log("测试LLM分组 -- 2")
+										console.log("%c[LLM轮换] 获取所有API配置请求已发送", "color: #E91E63;");
 										console.log("发送获取所有 API 配置请求")
 										vscode.postMessage({
 											type: "getAllApiConfigurations",
-											requestId: Date.now().toString(), // 添加请求 ID 以便跟踪
+											requestId: requestId, // 添加请求 ID 以便跟踪
 										})
+										// 添加延时检查，确认是否收到响应
+										setTimeout(() => {
+											console.log("%c[LLM轮换] 检查响应状态 (5秒超时)", "color: #9C27B0;");
+										}, 5000);
 										console.log("已发送获取所有 API 配置请求")
 									}
 								}}
