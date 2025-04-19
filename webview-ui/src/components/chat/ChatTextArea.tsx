@@ -190,9 +190,13 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			}
 
 			window.addEventListener("message", messageHandler)
-			return () => window.removeEventListener("message", messageHandler)
+			return () => {
+				console.log("%c[事件监听] 移除消息事件监听器", "color: #3F51B5;");
+				window.removeEventListener("message", messageHandler);
+			}
 			// 添加rotationEnabled 为什么？ 确保在组件卸载时移除事件监听器
 		}, [setInputValue, searchRequestId, rotationEnabled])
+		// }, [setInputValue, searchRequestId])
 
 		const [isDraggingOver, setIsDraggingOver] = useState(false)
 		const [textAreaBaseHeight, setTextAreaBaseHeight] = useState<number | undefined>(undefined)
