@@ -25,6 +25,7 @@ docs/_site/
 .env.*
 !.env.*.sample
 
+.cursor
 
 #Local lint config
 .eslintrc.local.json
