@@ -83,6 +83,9 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 	public readonly providerSettingsManager: ProviderSettingsManager
 	public readonly customModesManager: CustomModesManager
 
+	// ssj 2025-04-22 添加轮换索引的存储和获取方法
+	private readonly ROTATION_INDEX_KEY = "roo_cline_rotation_index"
+
 	constructor(
 		readonly context: vscode.ExtensionContext,
 		private readonly outputChannel: vscode.OutputChannel,
@@ -1536,5 +1539,25 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		}
 
 		return properties
+	}
+
+	// ssj 2025-04-22 获取当前轮换索引
+	public async getRotationIndex(): Promise<number> {
+		const index = await this.context.globalState.get(this.ROTATION_INDEX_KEY, 0)
+		return index
+	}
+
+	// ssj 2025-04-22 设置当前轮换索引
+	public async setRotationIndex(index: number): Promise<void> {
+		await this.context.globalState.update(this.ROTATION_INDEX_KEY, index)
+	}
+
+	// ssj 2025-04-22 更新轮换开关状态
+	public async updateRotationEnabled(enabled: boolean): Promise<void> {
+		await this.context.globalState.update("roo_cline_rotation_enabled", enabled)
+		// 如果关闭轮换，重置索引
+		if (!enabled) {
+			await this.setRotationIndex(0)
+		}
 	}
 }

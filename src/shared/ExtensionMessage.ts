@@ -69,9 +69,11 @@ export interface ExtensionMessage {
 		| "fileSearchResults"
 		| "toggleApiConfigPin"
 		| "acceptInput"
-		// ssj 2025-04-18 添加rotation 后端响应
-		| "allApiConfigurations" // Add this type for the response
-		| "error"  // ssj 添加为了webviewMessageHandler.ts文件
+		| "allApiConfigurations"
+		| "error"
+		| "getRotationIndex"
+		| "setRotationIndex"
+		| "updateRotationEnabled"
 	text?: string
 	action?:
 		| "chatButtonClicked"
@@ -117,12 +119,14 @@ export interface ExtensionMessage {
 	error?: string
 	// ssj 2025-04-18 添加rotation 后端响应
 	allApiConfigurations?: { configs: Record<string, ApiConfiguration>; meta: ApiConfigMeta[] }
-	// highlight-start
+	// highlight-start ssj
 	// --- 如果需要为 type 为 "error" 的消息定义特定字段，可以在这里添加 ---
 	// 例如：
 	message?: string // Specific message content when type is 'error'
 	// --- 结束添加 ---
 	// highlight-end
+	// ssj 2025-04-23 添加 index 属性，用于 getRotationIndex 响应
+	index?: number
 }
 
 export type ExtensionState = Pick<

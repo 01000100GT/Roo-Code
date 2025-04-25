@@ -191,10 +191,18 @@ export class ContextProxy {
 		// If a value is not present in the new configuration, then it is assumed
 		// that the setting's value should be `undefined` and therefore we
 		// need to remove it from the state cache if it exists.
+		// await this.setValues({
+		// 	...PROVIDER_SETTINGS_KEYS.filter((key) => !isSecretStateKey(key))
+		// 		.filter((key) => !!this.stateCache[key])
+		// 		.reduce((acc, key) => ({ ...acc, [key]: undefined }), {} as ProviderSettings),
+		// 	...values,
+		// })
 		await this.setValues({
-			...PROVIDER_SETTINGS_KEYS.filter((key) => !isSecretStateKey(key))
-				.filter((key) => !!this.stateCache[key])
-				.reduce((acc, key) => ({ ...acc, [key]: undefined }), {} as ProviderSettings),
+			// ssj 2025-04-24 将 key 断言为 ProviderSettings 的键，并检查 stateCache 中是否存在
+			...PROVIDER_SETTINGS_KEYS.filter(
+				(key): key is keyof ProviderSettings =>
+					!isSecretStateKey(key) && Object.prototype.hasOwnProperty.call(this.stateCache, key),
+			).reduce((acc, key) => ({ ...acc, [key]: undefined }), {} as Partial<ProviderSettings>), // 使用 Partial 确保类型安全
 			...values,
 		})
 	}

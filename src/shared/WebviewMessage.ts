@@ -130,6 +130,10 @@ export interface WebviewMessage {
 		| "showGreeting"
 		// ssj 2025-04-18 添加rotation 后端响应
 		| "getAllApiConfigurations" // <--- 在这里添加新的类型
+		// ssj 2025-04-24 将 getRotationIndex, setRotationIndex, updateRotationEnabled 添加到 type 联合类型。
+		| "getRotationIndex"
+		| "setRotationIndex"
+		| "updateRotationEnabled"
 	text?: string
 	disabled?: boolean
 	askResponse?: ClineAskResponse
@@ -155,6 +159,8 @@ export interface WebviewMessage {
 	source?: "global" | "project"
 	requestId?: string
 	ids?: string[]
+	// ssj 2025-04-24 添加 index?: number 和 bool?: boolean 属性。
+	index?: number
 }
 
 export const checkoutDiffPayloadSchema = z.object({

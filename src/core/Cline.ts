@@ -713,10 +713,18 @@ export class Cline extends EventEmitter<ClineEvents> {
 						} as Anthropic.Messages.TextBlockParam
 					} else if (block.type === "tool_result") {
 						// Convert block.content to text block array, removing images
+						// const contentAsTextBlocks = Array.isArray(block.content)
+						// 	? block.content.filter((item) => item.type === "text")
+						// 	: [{ type: "text", text: block.content }]
 						const contentAsTextBlocks = Array.isArray(block.content)
-							? block.content.filter((item) => item.type === "text")
-							: [{ type: "text", text: block.content }]
-						const textContent = contentAsTextBlocks.map((item) => item.text).join("\n\n")
+							? block.content.filter((item): item is Anthropic.TextBlockParam => item.type === "text")
+							: typeof block.content === "string"
+								? [{ type: "text", text: block.content }]
+								: []
+						// const textContent = contentAsTextBlocks.map((item) => item.text).join("\n\n")
+						const textContent = contentAsTextBlocks
+							.map((item) => item.text ?? "") // 使用空字符串作为默认值
+							.join("\n\n")
 						const toolName = findToolName(block.tool_use_id, existingApiConversationHistory)
 						return {
 							type: "text",

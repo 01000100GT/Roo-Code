@@ -44,8 +44,40 @@ function convertAnthropicContentToVertexGemini(content: Anthropic.Messages.Messa
 					} as FunctionResponsePart
 				} else {
 					// The only case when tool_result could be array is when the tool failed and we're providing ie user feedback potentially with images
-					const textParts = block.content.filter((part) => part.type === "text")
-					const imageParts = block.content.filter((part) => part.type === "image")
+					// const textParts = block.content.filter((part) => part.type === "text")
+					// const imageParts = block.content.filter((part) => part.type === "image")
+					// const text = textParts.length > 0 ? textParts.map((part) => part.text).join("\n\n") : ""
+					// const imageText = imageParts.length > 0 ? "\n\n(See next part for image)" : ""
+					// return [
+					// 	{
+					// 		functionResponse: {
+					// 			name,
+					// 			response: {
+					// 				name,
+					// 				content: text + imageText,
+					// 			},
+					// 		},
+					// 	} as FunctionResponsePart,
+					// 	...imageParts.map(
+					// 		(part) =>
+					// 			({
+					// 				inlineData: {
+					// 					data: part.source.data,
+					// 					mimeType: part.source.media_type,
+					// 				},
+					// 			}) as InlineDataPart,
+					// 	),
+					// ]
+					// The only case when tool_result could be array is when the tool failed and we're providing ie user feedback potentially with images
+					// ssj 2025-04-24 使用类型谓词确保 textParts 元素类型为 TextBlockParam
+					const textParts = block.content.filter(
+						(part): part is Anthropic.TextBlockParam => part.type === "text",
+					)
+					// ssj 2025-04-24 使用类型谓词确保 imageParts 元素类型为 ImageBlockParam
+					const imageParts = block.content.filter(
+						(part): part is Anthropic.ImageBlockParam => part.type === "image",
+					)
+					// ssj 2025-04-24 现在可以安全访问 textParts 中元素的 .text 属性
 					const text = textParts.length > 0 ? textParts.map((part) => part.text).join("\n\n") : ""
 					const imageText = imageParts.length > 0 ? "\n\n(See next part for image)" : ""
 					return [
@@ -58,12 +90,13 @@ function convertAnthropicContentToVertexGemini(content: Anthropic.Messages.Messa
 								},
 							},
 						} as FunctionResponsePart,
+						// ssj 2025-04-24 imageParts 已经是正确的类型，可以直接访问 source
 						...imageParts.map(
 							(part) =>
 								({
 									inlineData: {
-										data: part.source.data,
-										mimeType: part.source.media_type,
+										data: part.source.data, // 安全访问
+										mimeType: part.source.media_type, // 安全访问
 									},
 								}) as InlineDataPart,
 						),

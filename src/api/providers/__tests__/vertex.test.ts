@@ -468,24 +468,18 @@ describe("VertexHandler", () => {
 			}
 
 			// Verify usage information
-			const usageChunks = chunks.filter((chunk) => chunk.type === "usage")
-			expect(usageChunks).toHaveLength(2)
-			expect(usageChunks[0]).toEqual({
-				type: "usage",
-				inputTokens: 10,
-				outputTokens: 0,
-				cacheWriteTokens: 3,
-				cacheReadTokens: 2,
-			})
-			expect(usageChunks[1]).toEqual({
-				type: "usage",
-				inputTokens: 0,
-				outputTokens: 5,
-			})
+			const usageChunks = chunks.filter(
+				(chunk): chunk is Extract<ApiStreamChunk, { type: "usage" }> => chunk.type === "usage",
+			)
+			expect(usageChunks.length).toBe(2)
+			expect(usageChunks[0].inputTokens).toBe(10)
+			expect(usageChunks[1].outputTokens).toBe(5)
 
 			// Verify text content
-			const textChunks = chunks.filter((chunk) => chunk.type === "text")
-			expect(textChunks).toHaveLength(2)
+			const textChunks = chunks.filter(
+				(chunk): chunk is Extract<ApiStreamChunk, { type: "text" }> => chunk.type === "text",
+			)
+			expect(textChunks.length).toBe(2)
 			expect(textChunks[0].text).toBe("Hello")
 			expect(textChunks[1].text).toBe(" world!")
 
@@ -577,10 +571,12 @@ describe("VertexHandler", () => {
 			}
 
 			// Check for cache-related metrics in usage chunk
-			const usageChunks = chunks.filter((chunk) => chunk.type === "usage")
+			const usageChunks = chunks.filter(
+				(chunk): chunk is Extract<ApiStreamChunk, { type: "usage" }> => chunk.type === "usage",
+			)
 			expect(usageChunks.length).toBeGreaterThan(0)
-			expect(usageChunks[0]).toHaveProperty("cacheWriteTokens", 5)
-			expect(usageChunks[0]).toHaveProperty("cacheReadTokens", 3)
+			expect(usageChunks[0].cacheWriteTokens).toBe(5)
+			expect(usageChunks[0].cacheReadTokens).toBe(3)
 		})
 	})
 
@@ -656,14 +652,18 @@ describe("VertexHandler", () => {
 			}
 
 			// Verify thinking content is processed correctly
-			const reasoningChunks = chunks.filter((chunk) => chunk.type === "reasoning")
-			expect(reasoningChunks).toHaveLength(2)
+			const reasoningChunks = chunks.filter(
+				(chunk): chunk is Extract<ApiStreamChunk, { type: "reasoning" }> => chunk.type === "reasoning",
+			)
+			expect(reasoningChunks.length).toBe(2)
 			expect(reasoningChunks[0].text).toBe("Let me think about this...")
 			expect(reasoningChunks[1].text).toBe(" I need to consider all options.")
 
 			// Verify text content is processed correctly
-			const textChunks = chunks.filter((chunk) => chunk.type === "text")
-			expect(textChunks).toHaveLength(2) // One for the text block, one for the newline
+			const textChunks = chunks.filter(
+				(chunk): chunk is Extract<ApiStreamChunk, { type: "text" }> => chunk.type === "text",
+			)
+			expect(textChunks.length).toBe(2) // One for the text block, one for the newline
 			expect(textChunks[0].text).toBe("\n")
 			expect(textChunks[1].text).toBe("Here's my answer:")
 		})

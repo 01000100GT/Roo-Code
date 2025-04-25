@@ -1272,25 +1272,29 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 				vscode.window.showErrorMessage(t("common:errors.list_api_config"))
 			}
 			break
-		// highlight-start
-		// --- 添加这个 case 来处理获取所有 API 配置的请求 ---
+
+		// highlight-start ssj
+		// --- ssj 添加这个 case 来处理获取所有 API 配置的请求 ---
 		case "getAllApiConfigurations":
-			console.log("[Extension Backend] Received getAllApiConfigurations request", message.requestId);
+			console.log("[Extension Backend] Received getAllApiConfigurations request", message.requestId)
 			try {
 				// 1. 获取配置元数据列表 (list)
-				const listApiConfigMeta = await provider.providerSettingsManager.listConfig();
+				const listApiConfigMeta = await provider.providerSettingsManager.listConfig()
 
 				// 2. 获取所有详细配置信息 (configs)
 				//    这需要遍历元数据列表并加载每个配置
-				const allConfigs: Record<string, ApiConfiguration> = {};
+				const allConfigs: Record<string, ApiConfiguration> = {}
 				for (const meta of listApiConfigMeta) {
 					try {
 						// 使用 loadConfigById 可能更可靠，因为它基于不变的 ID
-						const { config } = await provider.providerSettingsManager.loadConfigById(meta.id);
-						allConfigs[meta.id] = config;
+						const { config } = await provider.providerSettingsManager.loadConfigById(meta.id)
+						allConfigs[meta.id] = config
 					} catch (loadError) {
 						// 如果某个配置加载失败，记录错误但继续处理其他配置
-						console.error(`[Extension Backend] Error loading config ${meta.name} (ID: ${meta.id}):`, loadError);
+						console.error(
+							`[Extension Backend] Error loading config ${meta.name} (ID: ${meta.id}):`,
+							loadError,
+						)
 						// 可以选择在这里添加一个标记或默认值，或者直接跳过
 						// allConfigs[meta.id] = { error: `Failed to load: ${loadError.message}` }; // 示例：添加错误信息
 					}
@@ -1302,24 +1306,23 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 					requestId: message.requestId, // 将请求 ID 传回
 					allApiConfigurations: {
 						meta: listApiConfigMeta, // 配置元数据数组
-						configs: allConfigs      // 以 ID 为键的配置对象
-					}
-				};
+						configs: allConfigs, // 以 ID 为键的配置对象
+					},
+				}
 
 				// 4. 将响应发送回 WebView
-				console.log("[Extension Backend] Sending allApiConfigurations response", responseMessage);
-				await provider.postMessageToWebview(responseMessage);
-
+				console.log("[Extension Backend] Sending allApiConfigurations response", responseMessage)
+				await provider.postMessageToWebview(responseMessage)
 			} catch (error) {
-				console.error("[Extension Backend] Error handling getAllApiConfigurations:", error);
+				console.error("[Extension Backend] Error handling getAllApiConfigurations:", error)
 				// （可选）向 WebView 发送错误消息
 				await provider.postMessageToWebview({
 					type: "error", // 或者定义一个特定的错误类型
 					message: "Failed to retrieve all API configurations.",
-					requestId: message.requestId // 包含请求 ID 以便跟踪
-				});
+					requestId: message.requestId, // 包含请求 ID 以便跟踪
+				})
 			}
-			break;
+			break
 		// --- 结束添加 ---
 		// highlight-end
 		case "updateExperimental": {
@@ -1409,6 +1412,34 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			telemetryService.updateTelemetryState(isOptedIn)
 			await provider.postStateToWebview()
 			break
+		}
+		case "getRotationIndex": {
+			const index = await provider.getRotationIndex()
+			await provider.postMessageToWebview({
+				type: "getRotationIndex",
+				index, // ssj 2025-04-23 index 现在已添加到 ExtensionMessage 中
+			})
+			return
+		}
+		case "setRotationIndex": {
+			// ssj 2025-04-23 添加检查，确保 message.index 不是 undefined
+			if (typeof message.index === "number") {
+				await provider.setRotationIndex(message.index)
+			} else {
+				console.error("[webviewMessageHandler] Received setRotationIndex message without a valid index.")
+			}
+			return
+		}
+		case "updateRotationEnabled": {
+			// ssj 2025-04-23 添加检查，确保 message.bool 不是 undefined
+			if (typeof message.bool === "boolean") {
+				await provider.updateRotationEnabled(message.bool)
+			} else {
+				console.error(
+					"[webviewMessageHandler] Received updateRotationEnabled message without a valid boolean value.",
+				)
+			}
+			return
 		}
 	}
 }
