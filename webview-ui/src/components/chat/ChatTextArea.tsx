@@ -70,7 +70,6 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		const rotationLLMsRef = useRef<ApiConfigMeta[]>([])
 		const [rotationIndex, setRotationIndex] = useState<number>(0)
 		// const [rotationEnabled, setRotationEnabled] = useState<boolean>(false)  // 这一行不需要添加
-		// const rotationIndexKey = "llmRotationIndex"
 
 		const { t } = useAppTranslation()
 		const {
